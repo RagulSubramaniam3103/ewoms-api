@@ -1,0 +1,68 @@
+<div class="create-post-container fade-in">
+  <div class="studio-header">
+    <div class="header-icon">
+      <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+    </div>
+    <div class="header-text">
+      <h2>Creation Studio</h2>
+      <p>Compose your message and share it with the world.</p>
+    </div>
+  </div>
+
+  <div class="studio-card">
+    <!-- Tiny Alerts -->
+    <div class="alert-container" *ngIf="successMsg || errorMsg">
+      <div *ngIf="successMsg" class="alert success-glow">{{ successMsg }}</div>
+      <div *ngIf="errorMsg" class="alert error-glow">{{ errorMsg }}</div>
+    </div>
+
+    <div class="studio-content">
+      <div class="composer-main">
+        <!-- Tiny Media Box -->
+        <div class="media-upload-area" [class.has-image]="imagePreview">
+          <label for="postImgUpload" class="upload-dropzone" *ngIf="!imagePreview">
+            <div class="dz-content">
+              <div class="dz-icon">
+                <svg viewBox="0 0 24 24" width="24"><path fill="currentColor" d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+              </div>
+              <span class="dz-hint">Add Photo</span>
+            </div>
+          </label>
+          
+          <div *ngIf="imagePreview" class="media-preview">
+            <img [src]="imagePreview" alt="Post Preview" class="preview-img">
+            <div class="preview-overlay">
+              <button class="change-img-btn" (click)="clearPostForm()">Remove</button>
+            </div>
+          </div>
+          
+          <input type="file" id="postImgUpload" (change)="onFileSelected($event)" hidden accept="image/*">
+        </div>
+
+        <!-- Tiny Text Composer -->
+        <div class="text-composer">
+          <textarea 
+            [(ngModel)]="newPostCaption" 
+            placeholder="Write a caption..." 
+            [disabled]="isPosting"
+          ></textarea>
+        </div>
+      </div>
+
+      <!-- Compact Footer -->
+      <div class="composer-footer">
+        <div class="character-count">
+          {{ newPostCaption.length }}/500
+        </div>
+        
+        <button class="premium-publish-btn" (click)="createPost()" [disabled]="isPosting || !selectedPostImage || !newPostCaption">
+          <div class="btn-content" *ngIf="!isPosting">
+            <span>Share Post</span>
+            <svg viewBox="0 0 24 24" width="16"><path fill="currentColor" d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+          </div>
+          <div class="loader" *ngIf="isPosting"></div>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

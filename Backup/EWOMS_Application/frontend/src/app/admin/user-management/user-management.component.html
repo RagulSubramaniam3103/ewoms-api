@@ -1,0 +1,101 @@
+<div class="view-panel fade-in">
+  <div class="panel-header">
+    <div class="header-left">
+      <h3>People Directory</h3>
+      <p>Manage access and details for all your team members.</p>
+    </div>
+    
+    <div class="role-tabs">
+      <button [class.active]="selectedRole === 'Admin'" (click)="onRoleChange('Admin')">Admins</button>
+      <button [class.active]="selectedRole === 'Manager'" (click)="onRoleChange('Manager')">Managers</button>
+      <button [class.active]="selectedRole === 'User'" (click)="onRoleChange('User')">Users</button>
+    </div>
+  </div>
+
+  <div class="panel-body">
+    <div class="toolbar">
+      <div class="search-field">
+        <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+        <input type="text" placeholder="Search members..." [(ngModel)]="searchTerm" (input)="onSearchChange()">
+      </div>
+      
+      <div class="page-count">
+        <label>Per page</label>
+        <select (change)="onPageSizeChange($event)">
+          <option value="10">10</option>
+          <option value="20">20</option>
+          <option value="50">50</option>
+        </select>
+      </div>
+    </div>
+
+    <div *ngIf="isLoading" class="loading-overlay">
+      <div class="loader"></div>
+    </div>
+
+    <div *ngIf="!isLoading && users.length === 0" class="not-found">
+      <p>No matches found in this category.</p>
+    </div>
+
+    <div class="table-container" *ngIf="!isLoading && users.length > 0">
+      <table class="premium-table">
+        <thead>
+          <tr>
+            <th>Identifier</th>
+            <th>Member Details</th>
+            <th>Contact</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of users">
+            <td class="id-col">{{ user.id }}</td>
+            <td>
+              <div class="member-info-row">
+                <div class="avatar-sm" (click)="openImagePopup(user, $event)">
+                  <img [src]="(user.profileImage || user.ProfileImage) ? 'data:image/webp;base64,' + (user.profileImage || user.ProfileImage) : 'https://ui-avatars.com/api/?name=' + (user.userName || user.username) + '&background=6366f1&color=fff'" alt="Avatar">
+                </div>
+                <div class="member-info">
+                  <span class="m-name">{{ user.userName || user.username }}</span>
+                  <span class="m-full">{{ user.fullName }}</span>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="contact-info">
+                <span class="m-email">{{ user.email }}</span>
+                <span class="m-phone">{{ user.phoneNumber || 'No phone' }}</span>
+              </div>
+            </td>
+            <td>
+              <span class="status-pill active">Active</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- GOOGLE-STYLE IDENTITY MODAL FOR USER PREVIEW -->
+  <div class="modal-overlay" *ngIf="activePopupImage" (click)="closeImagePopup()">
+    <div class="modal-card google-style" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <button class="g-close-btn" (click)="closeImagePopup()">
+          <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </div>
+      
+      <div class="g-profile-section">
+        <div class="full-image-container">
+          <img [src]="activePopupImage" alt="Identity Image">
+        </div>
+        
+        <div class="g-info">
+          <h3>{{ activePopupUserName }}</h3>
+          <p>{{ activePopupUserEmail }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

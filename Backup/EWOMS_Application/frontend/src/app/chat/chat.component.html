@@ -1,0 +1,375 @@
+<div class="enterprise-messenger">
+  <!-- SIDEBAR -->
+  <aside class="messenger-sidebar">
+    <!-- TAB NAVIGATION -->
+    <div class="sidebar-tabs">
+      <button [class.active]="activeTab === 'chats'" (click)="switchTab('chats')">
+        <i class="bi bi-chat-text"></i>
+      </button>
+      <button [class.active]="activeTab === 'requests'" (click)="switchTab('requests')">
+        <i class="bi bi-people"></i>
+        <span class="badge-mini" *ngIf="friendRequests.length > 0"></span>
+      </button>
+      <button [class.active]="activeTab === 'add'" (click)="switchTab('add')">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+
+    <div class="sidebar-content">
+      <!-- SEARCH / ADD FRIENDS -->
+      <div class="search-box" *ngIf="activeTab === 'add'">
+        <div class="search-input-wrap">
+          <i class="bi bi-search"></i>
+          <input type="text" placeholder="Search people..." [(ngModel)]="searchKey" (keyup)="searchUsers()">
+        </div>
+        <div class="chat-list mt-2">
+          <div class="chat-item" *ngFor="let u of searchResults">
+            <div class="avatar-container">
+              <img *ngIf="getAvatar(u)" [src]="getAvatar(u)" class="avatar-img">
+              <div *ngIf="!getAvatar(u)" class="avatar">{{ u.fullName?.charAt(0) || 'U' }}</div>
+            </div>
+            <div class="chat-info">
+              <span class="user-name">{{ u.fullName }}</span>
+              <span class="last-msg">{{ u.requestSent ? 'Request Sent' : 'Enterprise Member' }}</span>
+            </div>
+            <button class="p-action-btn add" *ngIf="!u.requestSent" (click)="sendRequest(u.userId)">
+              <i class="bi bi-person-plus"></i>
+            </button>
+          </div>
+        </div>
+          
+          <div class="empty-search-state" *ngIf="searchResults.length === 0 && searchKey">
+            <i class="bi bi-person-x"></i>
+            <p>No matches found for "{{ searchKey }}"</p>
+          </div>
+        </div>
+
+      <!-- CHATS LIST -->
+      <div class="chat-list" *ngIf="activeTab === 'chats'">
+        <div class="chat-item" 
+             *ngFor="let u of users" 
+             [class.active]="selectedFriend?.userId === u.userId"
+             (click)="selectUser(u)">
+          <div class="avatar-container">
+            <img *ngIf="getAvatar(u)" [src]="getAvatar(u)" class="avatar-img">
+            <div *ngIf="!getAvatar(u)" class="avatar">{{ u.fullName?.charAt(0) || 'U' }}</div>
+            <div class="status-dot" *ngIf="onlineUsers.has(u.userId)"></div>
+            <span class="avatar-unread-badge" *ngIf="u.unreadCount > 0">{{ u.unreadCount }}</span>
+          </div>
+          <div class="chat-info">
+            <div class="name-unread">
+              <span class="user-name">{{ u.fullName }}</span>
+            </div>
+            <span class="last-msg" [class.unread-text]="u.unreadCount > 0">{{ u.lastMessage || 'Start a conversation' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- REQUESTS LIST -->
+      <div class="request-list" *ngIf="activeTab === 'requests'">
+        <div class="chat-list">
+          <div class="chat-item" *ngFor="let req of friendRequests">
+            <div class="avatar-container">
+              <img *ngIf="getAvatar(req.sender)" [src]="getAvatar(req.sender)" class="avatar-img">
+              <div *ngIf="!getAvatar(req.sender)" class="avatar">{{ req.sender?.fullName?.charAt(0) || 'U' }}</div>
+            </div>
+            <div class="chat-info">
+              <span class="user-name">{{ req.sender?.fullName }}</span>
+              <span class="last-msg">Pending Request</span>
+            </div>
+            <button class="p-action-btn accept" (click)="acceptRequest(req.id)">
+              <i class="bi bi-check"></i>
+            </button>
+          </div>
+        </div>
+        <div class="empty-requests" *ngIf="friendRequests.length === 0">
+          <div class="empty-icon-box">
+            <i class="bi bi-person-plus"></i>
+          </div>
+          <p>No new requests</p>
+          <span>When someone wants to chat with you, you'll see it here.</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN CHAT AREA -->
+  <main class="chat-main">
+    <ng-container *ngIf="selectedFriend; else emptyState">
+      <header class="chat-header">
+        <div class="user-meta">
+          <div class="avatar-container" (click)="showDetails = true" style="cursor: pointer;">
+            <img *ngIf="getAvatar(selectedFriend)" [src]="getAvatar(selectedFriend)" class="avatar-img small">
+            <div *ngIf="!getAvatar(selectedFriend)" class="avatar small">{{ selectedFriend.fullName?.charAt(0) || 'U' }}</div>
+          </div>
+          <div class="name-status" (click)="showDetails = true" style="cursor: pointer;">
+            <h3>{{ selectedFriend.fullName }}</h3>
+            <span class="status-text" [class.online]="onlineUsers.has(selectedFriend.userId)">
+              {{ onlineUsers.has(selectedFriend.userId) ? 'Active now' : 'Offline' }}
+            </span>
+          </div>
+        </div>
+        <div class="header-actions">
+          <button class="details-toggle" (click)="showVault = !showVault" [class.active]="showVault" title="Open Media Vault">
+            <i class="bi bi-collection"></i>
+          </button>
+          <button class="details-toggle" (click)="showDetails = !showDetails" [class.active]="showDetails" title="View Profile">
+            <i class="bi bi-info-circle"></i>
+          </button>
+        </div>
+      </header>
+
+      <div class="chat-viewport-wrapper">
+        <div class="chat-view-main">
+          <div class="message-container" #scrollMe>
+        <div class="message-bubble" 
+             *ngFor="let msg of messages"
+             [class.sent]="msg.senderId !== selectedFriend.userId"
+             [class.received]="msg.senderId === selectedFriend.userId">
+          <div class="bubble-content">
+            <div class="msg-image" *ngIf="msg.image">
+              <img [src]="'data:image/jpeg;base64,' + msg.image" alt="Shared image" (click)="openImagePopup(msg.image)">
+            </div>
+            <div class="msg-video" *ngIf="msg.video">
+              <video [src]="'data:video/mp4;base64,' + msg.video" controls class="chat-video"></video>
+            </div>
+            <div class="msg-doc" *ngIf="msg.document">
+              <a [href]="'data:application/octet-stream;base64,' + msg.document" [download]="msg.fileName || 'document'" class="doc-link">
+                <i class="bi bi-file-earmark-arrow-down"></i>
+                <span>{{ msg.fileName || 'Document' }}</span>
+              </a>
+            </div>
+            
+            <!-- SMART TASK CARD -->
+            <div class="smart-task-bubble" *ngIf="msg.message?.startsWith('/task')">
+              <div class="task-status-line">
+                <i class="bi bi-clipboard-check"></i>
+                <span>Assigned Task</span>
+              </div>
+              <p>{{ msg.message.replace('/task', '').trim() }}</p>
+              <div class="task-footer">
+                <span class="status-pill" [class.done]="msg.isRead">
+                  {{ msg.isRead ? 'Completed' : 'Action Required' }}
+                </span>
+              </div>
+            </div>
+
+            <p *ngIf="msg.message && !msg.message.startsWith('/task')">{{ msg.message }}</p>
+          </div>
+          <div class="bubble-footer">
+            <span class="msg-time">{{ msg.sentAt | date:'shortTime' }}</span>
+            <div class="msg-status" *ngIf="msg.senderId === currentUserId">
+              <!-- Single Tick: Sent -->
+              <i class="bi bi-check" *ngIf="!msg.isDelivered && !msg.isRead"></i>
+              <!-- Double Tick: Delivered -->
+              <i class="bi bi-check-all" *ngIf="msg.isDelivered && !msg.isRead"></i>
+              <!-- Blue Double Tick: Read -->
+              <i class="bi bi-check-all read" *ngIf="msg.isRead"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer class="chat-footer">
+        <!-- EMOJI PICKER PANEL -->
+        <div class="emoji-picker-panel" *ngIf="showEmojiPicker">
+          <i class="bi bi-x-circle-fill panel-close" (click)="showEmojiPicker = false"></i>
+          <div class="emoji-grid">
+            <span *ngFor="let emoji of commonEmojis" (click)="addEmoji(emoji)">{{ emoji }}</span>
+          </div>
+        </div>
+
+        <!-- GIF PICKER PANEL -->
+        <div class="gif-picker-panel" *ngIf="showGifPicker">
+          <i class="bi bi-x-circle-fill panel-close" (click)="showGifPicker = false"></i>
+          <div class="gif-header">
+            <input type="text" placeholder="Search GIFs..." [(ngModel)]="gifSearchKey">
+            <i class="bi bi-search"></i>
+          </div>
+          <div class="gif-grid">
+            <img *ngFor="let gif of mockGifs" [src]="gif" (click)="selectGif(gif)">
+          </div>
+        </div>
+
+        <!-- IMAGE PREVIEW -->
+        <div class="chat-image-preview" *ngIf="imagePreview">
+          <div class="preview-container">
+            <img [src]="imagePreview" alt="Preview">
+            <button class="remove-preview" (click)="clearAttachments()">
+              <i class="bi bi-x-circle-fill"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- VIDEO PREVIEW -->
+        <div class="chat-image-preview" *ngIf="selectedVideo">
+          <div class="preview-container">
+            <video [src]="'data:video/mp4;base64,' + selectedVideo" class="preview-video" muted autoplay></video>
+            <div class="video-overlay"><i class="bi bi-play-fill"></i></div>
+            <button class="remove-preview" (click)="clearAttachments()">
+              <i class="bi bi-x-circle-fill"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- DOCUMENT PREVIEW -->
+        <div class="chat-image-preview" *ngIf="selectedDocument">
+          <div class="preview-container doc-preview">
+            <i class="bi bi-file-earmark-text"></i>
+            <span class="doc-name">{{ selectedFileName }}</span>
+            <button class="remove-preview" (click)="clearAttachments()">
+              <i class="bi bi-x-circle-fill"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="input-pill">
+          <!-- EMOJI TOGGLE -->
+          <i class="bi bi-emoji-smile" (click)="toggleEmojiPicker()"></i>
+          
+          <!-- GIF TOGGLE -->
+          <div class="gif-icon-btn" (click)="toggleGifPicker()">GIF</div>
+          
+          <!-- ATTACHMENT ICON -->
+          <label class="attachment-btn" for="chat-file-input" title="Attach file">
+            <i class="bi bi-paperclip"></i>
+          </label>
+          <input type="file" id="chat-file-input" hidden (change)="onFileSelected($event)" accept="image/*,video/*,.pdf,.doc,.docx,.xls,.xlsx,.txt">
+
+          <input type="text" 
+                 placeholder="Message..." 
+                 [(ngModel)]="messageText" 
+                 (keyup.enter)="sendMessage()">
+          <button class="send-btn" 
+                  *ngIf="messageText.trim() || selectedImage || selectedVideo || selectedDocument" 
+                  (click)="sendMessage()">Send</button>
+          <ng-container *ngIf="!messageText.trim() && !selectedImage && !selectedVideo && !selectedDocument">
+            <i class="bi bi-heart"></i>
+          </ng-container>
+        </div>
+      </footer>
+    </div>
+
+        <!-- MEDIA VAULT & TASK SIDEBAR -->
+        <aside class="media-vault-sidebar" [class.open]="showVault">
+          <div class="vault-header">
+            <h4>Shared Intelligence</h4>
+            <button (click)="showVault = false">×</button>
+          </div>
+
+          <div class="vault-tabs">
+            <button class="v-tab" [class.active]="activeVaultTab === 'assets'" (click)="activeVaultTab = 'assets'">Assets</button>
+            <button class="v-tab" [class.active]="activeVaultTab === 'tasks'" (click)="activeVaultTab = 'tasks'">Tasks</button>
+          </div>
+
+          <div class="vault-content">
+            <!-- MEDIA GRID -->
+            <div class="media-grid" *ngIf="activeVaultTab === 'assets'">
+              <div class="media-item" *ngFor="let m of sharedMedia">
+                <img *ngIf="m.image" [src]="'data:image/jpeg;base64,' + m.image" (click)="openImagePopup(m.image)">
+                <a [href]="'data:application/octet-stream;base64,' + m.document" [download]="m.fileName || 'document'" class="media-file-icon" *ngIf="m.document" style="text-decoration: none; color: inherit; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; width: 100%; background: rgba(99, 102, 241, 0.1); border-radius: 8px;">
+                  <i class="bi bi-file-earmark-pdf" style="font-size: 2rem; color: #6366f1;"></i>
+                  <span style="font-size: 0.7rem; margin-top: 4px;">{{ (m.fileName | slice:0:10) || 'File' }}</span>
+                </a>
+              </div>
+              <div class="empty-vault-tab" *ngIf="sharedMedia.length === 0">
+                <i class="bi bi-images"></i>
+                <p>No Assets Found</p>
+              </div>
+            </div>
+
+            <!-- TASK LIST -->
+            <div class="task-hub-list" *ngIf="activeVaultTab === 'tasks'">
+              <div class="hub-task-card" *ngFor="let t of chatTasks">
+                <div class="t-check"><i class="bi" [class.bi-check-circle-fill]="t.status === 'Completed'" [class.bi-circle]="t.status !== 'Completed'"></i></div>
+                <div class="t-body">
+                  <p>{{ t.text }}</p>
+                  <label>{{ t.sentAt | date:'MMM d' }} • {{ t.status }}</label>
+                </div>
+              </div>
+              <div class="empty-vault-tab" *ngIf="chatTasks.length === 0">
+                <i class="bi bi-list-check"></i>
+                <p>No Tasks Found</p>
+                <span style="font-size: 0.75rem; color: #94a3b8;">Type '/task your message' to create one.</span>
+              </div>
+            </div>
+
+            <div class="empty-vault" *ngIf="false">
+              <!-- Deprecated overall empty state, handled by tab specific empty states -->
+            </div>
+          </div>
+        </aside>
+      </div>
+    </ng-container>
+
+    <!-- USER DETAILS MODAL (POPUP STYLE) -->
+    <div class="simple-modal-overlay" *ngIf="selectedFriend && showDetails" (click)="showDetails = false">
+      <div class="user-popup-card" (click)="$event.stopPropagation()">
+        <div class="popup-header">
+          <h3>Profile Details</h3>
+          <button class="popup-close" (click)="showDetails = false">×</button>
+        </div>
+        
+        <div class="popup-body">
+          <div class="popup-avatar-section">
+            <div class="large-avatar-ring">
+              <img *ngIf="getAvatar(selectedFriend)" [src]="getAvatar(selectedFriend)" alt="User">
+              <div *ngIf="!getAvatar(selectedFriend)" class="avatar large">{{ selectedFriend.fullName?.charAt(0) || 'U' }}</div>
+              <div class="status-badge" [class.online]="onlineUsers.has(selectedFriend.userId)"></div>
+            </div>
+            <h4>{{ selectedFriend.fullName }}</h4>
+            <p class="u-meta">{{ onlineUsers.has(selectedFriend.userId) ? 'Active now' : 'Currently Offline' }}</p>
+            
+            <button class="view-profile-btn" (click)="onViewProfile()">
+              View Full Profile
+            </button>
+          </div>
+
+          <div class="popup-actions-grid">
+            <button class="p-action">
+              <i class="bi bi-bell"></i>
+              <span>Mute</span>
+            </button>
+            <button class="p-action">
+              <i class="bi bi-search"></i>
+              <span>Search</span>
+            </button>
+            <button class="p-action danger">
+              <i class="bi bi-slash-circle"></i>
+              <span>Block</span>
+            </button>
+          </div>
+
+          <div class="popup-section">
+            <label>Shared Media</label>
+            <div class="media-placeholder">
+              <i class="bi bi-images"></i>
+              <p>No shared photos yet</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ng-template #emptyState>
+      <div class="empty-chat">
+        <div class="icon-circle">
+          <i class="bi bi-messenger"></i>
+        </div>
+        <h2>Your Messages</h2>
+        <p>Send private photos and messages to a friend.</p>
+        <button class="primary-btn" (click)="switchTab('add')">Send Message</button>
+      </div>
+    </ng-template>
+  </main>
+
+  <!-- FULL SCREEN IMAGE POPUP -->
+  <div class="image-modal-overlay" *ngIf="fullScreenImage" (click)="closeImagePopup()">
+    <button class="modal-close-btn" (click)="closeImagePopup()">
+      <i class="bi bi-x-lg"></i>
+    </button>
+    <div class="image-modal-content" (click)="$event.stopPropagation()">
+      <img [src]="'data:image/jpeg;base64,' + fullScreenImage" alt="Full view">
+    </div>
+  </div>
+</div>

@@ -1,0 +1,40 @@
+<div class="contributions-container">
+  <!-- LOADING STATE -->
+  <div class="loader-canvas" *ngIf="isLoading">
+    <div class="pulse-loader"></div>
+    <p>Retrieving Contributions...</p>
+  </div>
+
+  <!-- EMPTY STATE -->
+  <div class="empty-state" *ngIf="!isLoading && posts.length === 0">
+    <i class="bi bi-collection"></i>
+    <p>No contributions found in this sector.</p>
+  </div>
+
+  <!-- GRID VIEW -->
+  <div class="contributions-grid" *ngIf="!isLoading && posts.length > 0">
+    <div class="contribution-card fade-in" *ngFor="let post of posts" (click)="openPostDetail(post)">
+      <div class="card-visual">
+        <img [src]="'data:image/jpeg;base64,' + post.displayImage" alt="Contribution">
+        <div class="card-overlay">
+          <div class="metric-badge">
+            <i class="bi bi-heart-fill"></i> {{ post.likeCount || 0 }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- POST DETAIL OVERLAY -->
+<div class="detail-overlay fade-in" *ngIf="selectedPost" (click)="closePostDetail()">
+  <div class="detail-card" (click)="$event.stopPropagation()">
+    <button class="close-detail-btn" (click)="closePostDetail()">
+      <i class="bi bi-x-lg"></i>
+    </button>
+    
+    <div class="detail-visual">
+      <img [src]="'data:image/jpeg;base64,' + selectedPost.displayImage" alt="Detail">
+    </div>
+  </div>
+</div>

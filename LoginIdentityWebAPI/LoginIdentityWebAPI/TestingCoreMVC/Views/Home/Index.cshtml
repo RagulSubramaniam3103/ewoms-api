@@ -1,0 +1,82 @@
+﻿@model List<TestingCoreMVC.Models.UserViewModel>
+
+@{
+    int TotalPages = ViewBag.TotalPages;
+    int CurrentPage = ViewBag.CurrentPage;
+    int VisiblePages = 5;
+
+    int StartPage = Math.Max(1, CurrentPage - 2);
+    int EndPage = Math.Min(TotalPages, StartPage + VisiblePages - 1);
+
+    if (EndPage - StartPage < VisiblePages - 1)
+    {
+        StartPage = Math.Max(1, EndPage - VisiblePages + 1);
+    }
+}
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Id</td>
+                <td>@item.Name</td>
+                <td>@item.Email</td>
+                <td>@item.Phone</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<nav>
+    <ul class="pagination justify-content-left">
+
+        @if (CurrentPage > 1)
+        {
+            <li class="page-item">
+                <a class="page-link" href="@Url.Action("Index", new { page = 1 })">1</a>
+            </li>
+        }
+
+        @if (StartPage > 2)
+        {
+            <li class="page-item disabled">
+                <span class="page-link">...</span>
+            </li>
+        }
+
+        @for (int i = StartPage; i <= EndPage; i++)
+        {
+            <li class="page-item @(i == CurrentPage ? "active" : "")">
+                <a class="page-link" href="@Url.Action("Index", new { page = i })">
+                    @i
+                </a>
+            </li>
+        }
+
+        @if (EndPage < TotalPages - 1)
+        {
+            <li class="page-item disabled">
+                <span class="page-link">...</span>
+            </li>
+        }
+
+        @if (CurrentPage < TotalPages)
+        {
+            <li class="page-item">
+                <a class="page-link" href="@Url.Action("Index", new { page = TotalPages })">
+                    @TotalPages
+                </a>
+            </li>
+        }
+
+    </ul>
+</nav>

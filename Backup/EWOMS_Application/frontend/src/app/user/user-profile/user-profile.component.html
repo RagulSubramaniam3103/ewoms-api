@@ -1,0 +1,154 @@
+<div class="profile-layout-container fade-in" *ngIf="user">
+  <!-- PREMIUM HEADER CARD -->
+  <div class="profile-header-card">
+    <div class="banner-dynamic">
+      <div class="banner-overlay"></div>
+    </div>
+    
+    <div class="profile-content-wrap">
+      <div class="avatar-column">
+        <div class="p-avatar-ring">
+          <img [src]="getAvatar(user) || 'https://ui-avatars.com/api/?name='+(user.fullName || 'U')+'&background=6366f1&color=fff'" 
+               alt="Profile" (click)="triggerOpenImage(getAvatar(user)!)">
+        </div>
+        <div class="status-indicator" *ngIf="!isOwn">
+          <span class="pulse-dot"></span> Active Now
+        </div>
+      </div>
+      
+      <div class="identity-column">
+        <div class="name-row">
+          <h2>{{ user.fullName }}</h2>
+          <i class="bi bi-patch-check-fill verified-icon" *ngIf="!user.isError"></i>
+          <i class="bi bi-lock-fill privacy-badge" *ngIf="user.isPrivate"></i>
+        </div>
+        
+        <p class="u-email">{{ user.email }}</p>
+        
+        <div class="badge-row">
+          <span class="premium-badge">{{ isOwn ? 'Administrator' : 'Enterprise Member' }}</span>
+          <span class="geo-badge"><i class="bi bi-geo-alt"></i> Global Operations</span>
+        </div>
+
+        <div class="action-row" *ngIf="!isOwn">
+          <button class="follow-action-btn" [class.is-following]="isFollowing" (click)="toggleFollow()">
+            <i class="bi" [ngClass]="isFollowing ? 'bi-person-check-fill' : 'bi-person-plus-fill'"></i>
+            {{ isFollowing ? 'Following' : 'Follow' }}
+          </button>
+          <button class="message-action-btn" (click)="switchToChat.emit()">
+            <i class="bi bi-chat-dots-fill"></i> Message
+          </button>
+        </div>
+      </div>
+
+      <div class="metrics-column">
+        <div class="metric-box clickable" (click)="triggerFollowers()">
+          <span class="m-val">{{ followersCount }}</span>
+          <span class="m-label">Followers</span>
+        </div>
+        <div class="metric-box clickable" (click)="triggerFollowing()">
+          <span class="m-val">{{ followingCount }}</span>
+          <span class="m-label">Following</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- REFINED SUB-NAV -->
+    <nav class="profile-tab-nav">
+      <button [class.active]="activeProfileTab === 'overview'" (click)="setProfileTab('overview')">
+        <i class="bi bi-grid"></i> Overview
+      </button>
+      <button [class.active]="activeProfileTab === 'posts'" (click)="setProfileTab('posts')">
+        <i class="bi bi-layers"></i> Contributions
+      </button>
+      <button [class.active]="activeProfileTab === 'about'" (click)="setProfileTab('about')">
+        <i class="bi bi-info-square"></i> Details
+      </button>
+      <button *ngIf="isOwn" [class.active]="activeProfileTab === 'saved'" (click)="setProfileTab('saved')">
+        <i class="bi bi-bookmark-star"></i> Saved
+      </button>
+    </nav>
+  </div>
+
+  <!-- TAB VIEWPORT -->
+  <div class="profile-tab-viewport">
+    
+    <!-- OVERVIEW TAB -->
+    <div class="overview-grid fade-in" *ngIf="activeProfileTab === 'overview'">
+      <div class="glass-card info-section">
+        <h3><i class="bi bi-person-badge"></i> Identity Credentials</h3>
+        <div class="data-field">
+          <label>Full Name</label>
+          <div class="val">{{ user.fullName }}</div>
+        </div>
+        <div class="data-field">
+          <label>Work Email</label>
+          <div class="val">{{ user.email }}</div>
+        </div>
+        <div class="data-field">
+          <label>Employee ID</label>
+          <div class="val">#EWM-{{ isOwn ? '001' : '842' }}</div>
+        </div>
+      </div>
+
+      <div class="glass-card stats-section">
+        <h3><i class="bi bi-graph-up-arrow"></i> Performance Metrics</h3>
+        <div class="progress-wrap">
+          <div class="p-header"><span>Task Efficiency</span><span>85%</span></div>
+          <div class="p-track"><div class="p-bar" style="width: 85%"></div></div>
+        </div>
+        <div class="progress-wrap">
+          <div class="p-header"><span>Collaboration</span><span>92%</span></div>
+          <div class="p-track"><div class="p-bar highlight" style="width: 92%"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTRIBUTIONS TAB -->
+    <div class="contributions-view fade-in" *ngIf="activeProfileTab === 'posts'">
+      <div class="view-meta">
+        <h3>Social Contributions <span class="badge">{{ currentPostCount }}</span></h3>
+        <button *ngIf="isOwn" class="add-story-btn" (click)="triggerCreatePost()">
+          <i class="bi bi-plus-circle"></i> New Story
+        </button>
+      </div>
+      <app-social-contributions [userId]="isOwn ? currentLoggedInUserId : user.userId" 
+                                 [viewType]="'list'"></app-social-contributions>
+    </div>
+
+    <!-- DETAILS TAB -->
+    <div class="details-view fade-in" *ngIf="activeProfileTab === 'about'">
+      <div class="glass-card full-width" *ngIf="targetAbout; else noAbout">
+        <h3><i class="bi bi-geo-alt"></i> Contact & Location</h3>
+        <div class="details-grid">
+          <div class="data-field"><label>Phone</label><div class="val">{{ targetAbout.phoneNumber || 'N/A' }}</div></div>
+          <div class="data-field"><label>City</label><div class="val">{{ targetAbout.city }}</div></div>
+          <div class="data-field"><label>Country</label><div class="val">{{ targetAbout.country || 'Global' }}</div></div>
+          <div class="data-field full"><label>Address</label><div class="val">{{ targetAbout.address || 'Confidential' }}</div></div>
+        </div>
+      </div>
+      <ng-template #noAbout>
+        <div class="empty-placeholder">
+          <i class="bi bi-shield-slash"></i>
+          <p>Additional profile data is restricted or not provided.</p>
+        </div>
+      </ng-template>
+    </div>
+
+    <!-- SAVED TAB -->
+    <div class="saved-view fade-in" *ngIf="activeProfileTab === 'saved'">
+      <div class="view-meta">
+        <h3>Saved Intelligence</h3>
+        <p>Your bookmarked stories and reports.</p>
+      </div>
+      <app-social-contributions [userId]="currentLoggedInUserId" 
+                                 [viewType]="'grid'"></app-social-contributions>
+    </div>
+
+  </div>
+</div>
+
+<div class="profile-loader" *ngIf="!user">
+  <div class="pulse-ring"></div>
+  <p>Initializing Secure Profile...</p>
+</div>

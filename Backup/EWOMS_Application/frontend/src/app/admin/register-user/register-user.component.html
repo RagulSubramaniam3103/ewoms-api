@@ -1,0 +1,69 @@
+<div class="card-root fade-in">
+  <div class="card-header-main">
+    <h3>Add New Team Member</h3>
+    <p>Set up a new account and define system access levels.</p>
+  </div>
+
+  <div class="card-body-main">
+    <!-- Feedback -->
+    <div *ngIf="successMessage" class="banner success">{{ successMessage }}</div>
+    <div *ngIf="errorMessage" class="banner error">{{ errorMessage }}</div>
+
+    <div class="reg-layout">
+      <!-- Media Section -->
+      <div class="media-column">
+        <div class="avatar-circle">
+          <img *ngIf="imagePreview" [src]="imagePreview" alt="Preview">
+          <div *ngIf="!imagePreview" class="empty-avatar">
+            <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+          </div>
+        </div>
+        <button class="up-btn" (click)="fileInput.click()">
+          {{ imagePreview ? 'Update Photo' : 'Upload Photo' }}
+        </button>
+        <input type="file" #fileInput hidden (change)="onFileSelected($event)" accept="image/*">
+        <p class="media-hint">Use a clear square image.</p>
+      </div>
+
+      <!-- Form Section -->
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="form-column">
+        <div class="field-grid">
+          <div class="field-box">
+            <label>Full Name</label>
+            <input type="text" formControlName="FullName" placeholder="e.g. Robert Fox">
+          </div>
+          <div class="field-box">
+            <label>System Username</label>
+            <input type="text" formControlName="UserName" placeholder="e.g. robert_fox">
+          </div>
+        </div>
+
+        <div class="field-grid">
+          <div class="field-box">
+            <label>Work Email</label>
+            <input type="email" formControlName="Email" placeholder="robert@company.com">
+          </div>
+          <div class="field-box">
+            <label>Assigned Responsibility</label>
+            <select formControlName="UserRole">
+              <option *ngFor="let role of roles" [value]="role">{{ role }}</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field-box">
+          <label>Temporary Password</label>
+          <input type="password" formControlName="Password" placeholder="Minimum 6 characters">
+          <span class="field-hint">User will be required to update this on first sign-in.</span>
+        </div>
+
+        <div class="form-footer">
+          <button type="submit" class="submit-action" [disabled]="isLoading || registerForm.invalid">
+            <span *ngIf="!isLoading">Register Member</span>
+            <span *ngIf="isLoading" class="loader-sm"></span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,19 @@
+# Visual Studio / .NET
+[Bb]in/
+[Oo]bj/
+.vs/
+*.user
+*.suo
+*.sln.docstates
+
+# Node / Angular
+node_modules/
+dist/
+.angular/
+npm-debug.log
+EWOMS_Application/chat-server/chat.db
+
+# Misc
+.DS_Store
+*.zip
+*.bak

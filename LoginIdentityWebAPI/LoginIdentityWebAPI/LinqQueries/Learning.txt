@@ -1,0 +1,855 @@
+﻿ #region SelectMany
+    //public class StudentData
+    //{
+    //    public int StdId { get; set; }
+    //    public string StudentName { get; set; }
+    //    public List<String> SchoolDept { get; set; }
+    //}
+    //    bool continueprocess = true;
+    //    List<StudentData> studentDatas = new List<StudentData>()
+    //        {
+    //            new StudentData { StdId = 1, StudentName = "Ragul", SchoolDept = new List<string> { "Maths", "CS" } },
+    //            new StudentData { StdId = 2, StudentName = "Mani", SchoolDept = new List<string> { "Maths", "Accounts" } },
+    //            new StudentData { StdId = 3, StudentName = "Kumar", SchoolDept = new List<string> { "Biology", "CS" } },
+    //            new StudentData { StdId = 4, StudentName = "Reena", SchoolDept = new List<string> { "Maths", "Biology" } }
+    //        };
+    //    List<string> ListDept = new List<string>()
+    //        {
+    //            "Maths", "CS", "Biology", "Accounts"
+    //        };
+    //    Console.WriteLine("Choose Department : ");
+    //        foreach (var dept in ListDept)
+    //        {
+    //            Console.WriteLine(dept);
+    //        }
+
+    //while (continueprocess)
+    //{
+    //    Console.Write("Enter your choice : ");
+    //    string getdept = Console.ReadLine();
+
+    //    var getstudentsdetails = studentDatas.SelectMany(
+    //        student => student.SchoolDept,
+    //        (student, dept) => new
+    //        {
+    //            StdId = student.StdId,
+    //            StudentName = student.StudentName,
+    //            DeptName = dept
+    //        }).Where(x => x.DeptName == getdept);
+    //    foreach (var data in getstudentsdetails)
+    //    {
+    //        Console.WriteLine("StudentId: " + data.StdId + ", StudentName: " + data.StudentName + ", DeptName: " + data.DeptName);
+    //    }
+
+    //    Console.Write("Do you want to continue (y/n): ");
+    //    string continuechoice = Console.ReadLine();
+    //    if (continuechoice.ToLower() != "y")
+    //    {
+    //        continueprocess = false;
+    //    }
+    //}
+    #endregion
+
+    //public static string connectionstring = "Server=172.19.1.7;Database=Master;User Id=sa;Password=sql#nit@8205rk45;TrustServerCertificate=True;";
+
+    //public class Customer
+    //{
+    //    public int CustomerId { get; set; }
+    //    public string CustomerName { get; set; }
+    //    public string City { get; set; }
+    //}
+
+    //public class Product
+    //{
+    //    public int ProductId { get; set; }
+    //    public string ProductName { get; set; }
+    //    public decimal Price { get; set; }
+    //}
+    //public class Order
+    //{
+    //    public int OrderId { get; set; }
+    //    public int CustomerId { get; set; }
+    //    public int ProductId { get; set; }
+    //    public int Quantity { get; set; }
+    //}
+    //public class OrderPayment
+    //{
+    //    public int OrderId { get; set; }
+    //    public decimal Discount { get; set; }
+    //}
+
+
+    //List<Customer> customers = new List<Customer>
+    //{
+    //    new Customer { CustomerId = 1, CustomerName = "Ramesh", City = "Mumbai" },
+    //    new Customer { CustomerId = 2, CustomerName = "Suresh", City = "Delhi" },
+    //    new Customer { CustomerId = 3, CustomerName = "Anita", City = "Bangalore" },
+    //    new Customer { CustomerId = 4, CustomerName = "Priya", City = "Chennai" },
+    //    new Customer { CustomerId = 5, CustomerName = "Vikram", City = "Hyderabad" }
+    //};
+    //List<Order> orders = new List<Order>
+    //{
+    //    new Order { OrderId = 101, CustomerId = 1, ProductId = 1, Quantity = 1 },
+    //    new Order { OrderId = 102, CustomerId = 2, ProductId = 2, Quantity = 2 },
+    //    new Order { OrderId = 103, CustomerId = 3, ProductId = 3, Quantity = 1 }
+    //};
+
+    //var leftjoinusing = from custom in customers
+    //                    join order in orders
+    //                    on custom.CustomerId equals order.CustomerId
+    //                    select new
+    //                    {
+    //                        CustomerId = custom.CustomerId,
+    //                        CustomerName = custom.CustomerName,
+    //                        OrderId = order != null ? order.OrderId : 0
+    //                    };
+
+
+    //var leftjoinusage = from custom in customers
+    //                    join order in orders
+    //                    on custom.CustomerId equals order.CustomerId 
+    //                    into customerorder
+    //                    from order in customerorder.DefaultIfEmpty()
+    //                    select new
+    //                    {
+    //                        CustomerId = custom.CustomerId,
+    //                        CustomerName = custom.CustomerName,
+    //                        OrderId = order != null ? order.OrderId : 0
+    //                    };
+
+    //foreach (var data in leftjoinusage)
+    //{
+    //    Console.Write(data.CustomerId + " " + data.CustomerName + " " + data.OrderId + "\n");
+    //}
+
+    #region Product
+    //List<Customer> customers = new List<Customer>
+    //{
+    //    new Customer { CustomerId = 1, CustomerName = "Ramesh", City = "Mumbai" },
+    //    new Customer { CustomerId = 2, CustomerName = "Suresh", City = "Delhi" },
+    //    new Customer { CustomerId = 3, CustomerName = "Anita", City = "Bangalore" },
+    //    new Customer { CustomerId = 4, CustomerName = "Priya", City = "Chennai" },
+    //    new Customer { CustomerId = 5, CustomerName = "Vikram", City = "Hyderabad" }
+    //};
+    //List<Product> products = new List<Product>
+    //{
+    //    new Product { ProductId = 1, ProductName = "Laptop", Price = 75000 },
+    //    new Product { ProductId = 2, ProductName = "Smartphone", Price = 50000 },
+    //    new Product { ProductId = 3, ProductName = "Tablet", Price = 30000 },
+    //    new Product { ProductId = 4, ProductName = "Headphones", Price = 5000 }
+    //};
+    //List<Order> orders = new List<Order>
+    //{
+    //    new Order { OrderId = 101, CustomerId = 1, ProductId = 1, Quantity = 1 },
+    //    new Order { OrderId = 102, CustomerId = 2, ProductId = 2, Quantity = 2 },
+    //    new Order { OrderId = 103, CustomerId = 3, ProductId = 3, Quantity = 1 },
+    //    new Order { OrderId = 104, CustomerId = 4, ProductId = 4, Quantity = 3 },
+    //    new Order { OrderId = 105, CustomerId = 5, ProductId = 2, Quantity = 1 },
+    //    new Order { OrderId = 106, CustomerId = 1, ProductId = 3, Quantity = 1 },
+    //    new Order { OrderId = 107, CustomerId = 1, ProductId = 2, Quantity = 1 }
+    //};
+    //List<OrderPayment> orderPayments = new List<OrderPayment>
+    //{
+    //    new OrderPayment { OrderId = 101, Discount = 5 },
+    //    new OrderPayment { OrderId = 102, Discount = 10 },
+    //    new OrderPayment { OrderId = 103, Discount = 0 },
+    //    new OrderPayment { OrderId = 104, Discount = 6 },
+    //    new OrderPayment { OrderId = 105, Discount = 5 },
+    //    new OrderPayment { OrderId = 106, Discount = 0 },
+    //    new OrderPayment { OrderId = 107, Discount = 5 }
+    //};
+
+    //var finalpaidcustomerorder = from customerslist in customers
+    //                             join orderslist in orders
+    //                             on customerslist.CustomerId equals orderslist.CustomerId
+    //                             join productslist in products
+    //                             on orderslist.ProductId equals productslist.ProductId
+    //                             join orderpaymentlist in orderPayments
+    //                             on orderslist.OrderId equals orderpaymentlist.OrderId
+    //                             select new
+    //                             {
+    //                                 CustomerName = customerslist.CustomerName,
+    //                                 ProductName = productslist.ProductName,
+    //                                 ProductPrice = productslist.Price,
+    //                                 Quantity = orderslist.Quantity,
+    //                                 Purchasecity = customerslist.City,
+    //                                 PurchasedPrice = (productslist.Price * orderslist.Quantity) * (1 - (orderpaymentlist.Discount / 100.0m))
+    //                             }
+    //                             into finaldata
+    //                             group finaldata by new
+    //                             {
+    //                                 finaldata.CustomerName,
+    //                                 finaldata.ProductName,
+    //                                 finaldata.ProductPrice,
+    //                                 finaldata.Quantity,
+    //                                 finaldata.Purchasecity,
+    //                                 finaldata.PurchasedPrice
+    //                             } into groupdata
+    //                             select new
+    //                             {
+    //                                 customername = groupdata.Key.CustomerName,
+    //                                 TotalPurchasedprice = groupdata.Sum(x => x.PurchasedPrice),
+    //                             };
+
+    //var sumpruchaseprice = from finalprice in finalpaidcustomerorder
+    //                       group finalprice by finalprice.customername 
+    //                       into groupeddata
+    //                       select new
+    //                         {
+    //                              Customername = groupeddata.Key,
+    //                              Totalprice = groupeddata.Sum(x => x.TotalPurchasedprice)
+    //                         };
+
+
+    //foreach (var test in sumpruchaseprice)
+    //{
+    //    Console.WriteLine("Customer: " + test.Customername + ", TotalPurchasedprice: " + test.Totalprice);
+    //}
+
+
+    //foreach (var data in finalpaidcustomerorder)
+    //{
+    //    //Console.WriteLine("Customer: " + data.CustomerName + ", City: "+ data.Purchasecity + ", Product: " + data.ProductName + ", Price: " + data.ProductPrice + ",Quantity: " + data.Quantity + ", FinalPrice: " + data.PurchasedPrice);
+    //}
+    #endregion
+
+    #region Studentmark
+
+    //public class StudentList
+    //{
+    //    public int Stdid { get; set; }
+    //    public String StudentName { get; set; }
+    //    public int DeptId { get; set; }
+    //}
+
+    //public class StudentEnrollment
+    //{
+
+    //    public int Stdid { get; set; }
+    //    public int AcademicYear { get; set; }
+    //}
+
+    //public class DeptDetails
+    //{
+    //    public int DeptId { get; set; }
+    //    public string DeptName { get; set; }
+    //}
+
+    //public class DeptStudentMarkList
+    //{
+    //    public int StdId { get; set; }
+    //    public int DeptId { get; set; }
+    //    public double Mark1 { get; set; }
+    //    public double Mark2 { get; set; }
+    //    public double Mark3 { get; set; }
+    //    public double Mark4 { get; set; }
+    //    public double Mark5 { get; set; }
+    //}
+    //List<StudentList> ListstudentDept = new List<StudentList>();
+    //ListstudentDept.Add(new StudentList() { Stdid = 1 ,StudentName = "Ragul", DeptName = "CSE" });
+    //ListstudentDept.Add(new StudentList() { Stdid = 2 ,StudentName = "Mani", DeptName = "ECE" });
+    //ListstudentDept.Add(new StudentList() { Stdid = 3 ,StudentName = "Kumar", DeptName = "MECH" });
+    //ListstudentDept.Add(new StudentList() { Stdid = 4 ,StudentName = "Reena", DeptName = "CSE" });
+    //ListstudentDept.Add(new StudentList() { Stdid = 5 ,StudentName = "Ram", DeptName = "IT" });
+    //ListstudentDept.Add(new StudentList() { Stdid = 6 ,StudentName = "Tamil", DeptName = "MECH" });
+    //ListstudentDept.Add(new StudentList() { Stdid = 7 ,StudentName = "Sundar", DeptName = "EEE" });
+
+    //List<DeptDetails> ListDept = new List<DeptDetails>
+    //{
+    //    new DeptDetails { DeptId = 1, DeptName = "CSE" },
+    //    new DeptDetails { DeptId = 2, DeptName = "ECE" },
+    //    new DeptDetails { DeptId = 3, DeptName = "MECH" },
+    //    new DeptDetails { DeptId = 4, DeptName = "IT" },
+    //    new DeptDetails { DeptId = 5, DeptName = "EEE" }
+    //};
+
+    //List<StudentEnrollment> ListStdEnrollment = new List<StudentEnrollment>
+    //{
+    //    new StudentEnrollment { Stdid = 1, AcademicYear = 2026 },
+    //    new StudentEnrollment { Stdid = 2, AcademicYear = 2026 },
+    //    new StudentEnrollment { Stdid = 3, AcademicYear = 2026 },
+    //    new StudentEnrollment { Stdid = 4, AcademicYear = 2026 },
+    //    new StudentEnrollment { Stdid = 5, AcademicYear = 2026 },
+    //    new StudentEnrollment { Stdid = 6, AcademicYear = 2026 },
+    //    new StudentEnrollment { Stdid = 7, AcademicYear = 2026 }
+    //};
+
+    //List<StudentList> ListstudentDept = new List<StudentList>
+    //{
+    //    new StudentList { Stdid = 1, StudentName = "Ragul", DeptId=1 },
+    //    new StudentList { Stdid = 2, StudentName = "Mani", DeptId=2 },
+    //    new StudentList { Stdid = 3, StudentName = "Kumar" , DeptId=3 },
+    //    new StudentList { Stdid = 4, StudentName = "Reena", DeptId=1 },
+    //    new StudentList { Stdid = 5, StudentName = "Ram",  DeptId=4 },
+    //    new StudentList { Stdid = 6, StudentName = "Tamil", DeptId=3},
+    //    new StudentList { Stdid = 7, StudentName = "Sundar", DeptId=5 }
+    //};
+
+    //List<DeptStudentMarkList> DeptStudentList = new List<DeptStudentMarkList>
+    //{
+    //    new DeptStudentMarkList { StdId = 1, DeptId = 1, Mark1 = 99, Mark2 = 90, Mark3 = 88, Mark4 = 99, Mark5 = 92 },
+    //    new DeptStudentMarkList { StdId = 2, DeptId = 2, Mark1 = 80, Mark2 = 85, Mark3 = 82, Mark4 = 87, Mark5 = 90 },
+    //    new DeptStudentMarkList { StdId = 3, DeptId = 3, Mark1 = 75, Mark2 = 80, Mark3 = 70, Mark4 = 78, Mark5 = 85 },
+    //    new DeptStudentMarkList { StdId = 4, DeptId = 1, Mark1 = 88, Mark2 = 92, Mark3 = 84, Mark4 = 90, Mark5 = 95 },
+    //    new DeptStudentMarkList { StdId = 5, DeptId = 4, Mark1 = 82, Mark2 = 87, Mark3 = 80, Mark4 = 85, Mark5 = 88 },
+    //    new DeptStudentMarkList { StdId = 6, DeptId = 3, Mark1 = 78, Mark2 = 82, Mark3 = 75, Mark4 = 80, Mark5 = 83 },
+    //    new DeptStudentMarkList { StdId = 7, DeptId = 5, Mark1 = 90, Mark2 = 95, Mark3 = 88, Mark4 = 92, Mark5 = 96 }
+    //};
+
+
+    //var geteachdepttopper = from ListDepts in ListDept
+    //                        join Liststudents in ListstudentDept
+    //                        on ListDepts.DeptId equals Liststudents.DeptId
+    //                        join Listenroll in ListStdEnrollment
+    //                        on Liststudents.Stdid equals Listenroll.Stdid
+    //                        join Listmarks in DeptStudentList
+    //                        on Liststudents.Stdid equals Listmarks.StdId
+    //                        select new
+    //                        {
+    //                            StudentId = Liststudents.Stdid,
+    //                            StudentName = Liststudents.StudentName,
+    //                            DeptName = ListDepts.DeptName,
+    //                            AcademicYear = Listenroll.AcademicYear,
+    //                            TotalMarks = Listmarks.Mark1 + Listmarks.Mark2 + Listmarks.Mark3 + Listmarks.Mark4 + Listmarks.Mark5
+    //                        }
+    //                        into finaldata
+    //                        group finaldata by finaldata.DeptName into deptgroup
+    //                        select new
+    //                        {
+    //                            Deptname = deptgroup.Key,
+    //                            TopperStudent = deptgroup.OrderByDescending(x => x.TotalMarks).Select(y => new
+    //                            {
+    //                                StudentName = y.StudentName,
+    //                                Marks = y.TotalMarks
+    //                            }).FirstOrDefault(),
+    //                        }
+    //                        into data
+    //                        where data.TopperStudent.Marks > 420
+    //                        select data;
+
+    //foreach (var getstddata in geteachdepttopper)
+    //{
+    //    Console.Write(getstddata.Deptname + "->" + getstddata.TopperStudent.StudentName + ", TotalMarks: " + getstddata.TopperStudent.Marks + "\n");
+    //}
+
+
+
+    //var averagepercentagedept = from dept in ListDept
+    //                            join student in ListstudentDept
+    //                            on dept.DeptId equals student.DeptId
+    //                            join deptmark in DeptStudentList
+    //                            on student.Stdid equals deptmark.StdId
+
+    //                            select new
+    //                            {
+    //                                DeptName = dept.DeptName,
+    //                                TotalMarks = deptmark.Mark1 + deptmark.Mark2 + deptmark.Mark3 + deptmark.Mark4 + deptmark.Mark5,
+    //                            }
+    //                            into deptmarks
+    //                            group deptmarks by deptmarks.DeptName into deptgroup
+    //                            select new
+    //                            {
+    //                                DeptName = deptgroup.Key,
+    //                                Averagemarks = deptgroup.Average(x => x.TotalMarks)
+    //                            };
+
+    //foreach (var getavg in averagepercentagedept.Distinct())
+    //{
+    //    Console.Write("DeptName: " + getavg.DeptName + ", Totalmarks: " + getavg.Averagemarks + "\n");
+    //}
+
+
+    //var querystudentdetails = from Depts in ListDept
+    //                          join students in ListstudentDept
+    //                          on Depts.DeptId equals students.DeptId
+    //                          join enroll in ListStdEnrollment
+    //                          on students.Stdid equals enroll.Stdid
+    //                          join marks in DeptStudentList
+    //                          on students.Stdid equals marks.StdId
+    //                          select new
+    //                          {
+    //                              StudentId = students.Stdid,
+    //                              StudentName = students.StudentName,
+    //                              DeptName = Depts.DeptName,
+    //                              AcademicYear = enroll.AcademicYear,
+    //                              TotalMarks = marks.Mark1 + marks.Mark2 + marks.Mark3 + marks.Mark4 + marks.Mark5
+    //                          };
+
+    //var finaldatas = from studentlist in querystudentdetails
+    //                 orderby studentlist.TotalMarks descending
+    //                 select studentlist;
+
+
+
+
+
+
+    //foreach (var student in finaldatas)
+    //{
+    //    Console.Write("StudentId: " + student.StudentId + ", StudentName: " + student.StudentName + ", DeptName: " + student.DeptName + ", AcademicYear: " + student.AcademicYear + ", TotalMarks: " + student.TotalMarks+"\n");
+    //}
+
+    #endregion
+    #region test
+    //var Abb = "Language Integrated Query";
+    //Console.WriteLine("LINQ : " + Abb);
+
+
+    //int[] a = [21, 43, 23, 11, 53, 546, 12, 65, 88, 323, 99, 74, 2, 46, 15, 67, 88, 95];
+
+    //Dictionary<int, string> ListMethodSyntax = new Dictionary<int, string>()
+    //{
+    //    {1, "Where"},
+    //    {2, "Select"},
+    //    {3, "OrderBy"},
+    //    {4, "OrderByDescending"},
+    //    {5, "ThenBy"},
+    //    {6, "ThenByDescending"},
+    //    {7, "First"},
+    //    {8, "FirstOrDefault"},
+    //    {9, "Single"},
+    //    {10, "SingleOrDefault"},
+    //    {11, "Any"},
+    //    {12, "All"},
+    //    {13, "Count"},
+    //    {14, "Sum"},
+    //    {15, "Min"},
+    //    {16, "Max"},
+    //    {17, "Average"},
+    //    {18, "Take"},
+    //    {19, "Skip"},
+    //    {20, "Distinct"},
+    //    {21, "GroupBy"},
+    //    {22, "Join"}
+    //};
+
+
+
+    //Dictionary<int, string> ListConcept = new Dictionary<int, string>();
+
+    //ListConcept.Add(1, "Query Syntax");
+    //ListConcept.Add(2, "Method Syntax");
+
+    //Console.WriteLine();
+
+    //Console.WriteLine("LINQ Concepts");
+
+    //foreach (var concept in ListConcept)
+    //{
+    //    Console.WriteLine(concept.Key + ": " + concept.Value);
+    //}
+    //Console.Write("Enter your choice : ");
+    //int getvalue = int.Parse(Console.ReadLine());
+    //InputConcept(getvalue, a, ListMethodSyntax);
+    #endregion
+    #region startcomment
+
+    //var groupdetail = ListstudentDept.GroupBy(x => x.DeptName).Select(x => new
+    //{
+    //    DeptName = x.Key,
+    //    TotalStudents = x.Count(),
+    //    StudentList = x.Select(y => y.StudentName).ToList()
+    //});
+
+
+
+    //var querytype = from student in ListstudentDept
+    //                group student by student.DeptName into finalgroup
+    //                select new
+    //                {
+    //                    DeptName = finalgroup.Key,
+    //                    TotalStudents = finalgroup.Count(),
+    //                    StudentList = finalgroup.Select(y => y.StudentName).ToList()
+    //                };
+
+
+    //foreach (var getdetails in querytype)
+    //{
+    //    Console.Write(getdetails.DeptName + " " + getdetails.TotalStudents + " ");
+    //    for (int i = 0; i < getdetails.StudentList.Count; i++)
+    //    {
+    //        Console.Write(getdetails.StudentList[i].ToString());
+    //        if (i != getdetails.StudentList.Count - 1)
+    //            Console.Write(", ");
+    //    }
+
+    //    Console.WriteLine();
+    //}
+
+    //var multipledata = Enumerable.Range(1, 50).Select(i => new
+    //{
+    //    Id=i,
+    //    Name = "Test"+i,
+    //    Emailid = "Test"+i+"@gmail.com"
+    //});
+    //int gettotalrecords = multipledata.Count();
+    //int PageNumber = 5;
+    //int PageSize = 10;
+    //testresult(multipledata, PageNumber, PageSize);
+
+
+    //public static void testresult(IEnumerable<dynamic> multipledata,int PageNumber,int PageSize)
+    //{
+    //    var getresult = multipledata.Skip((PageNumber - 1) * PageSize).Take(PageSize);
+
+    //    foreach (var data in getresult)
+    //    {
+    //        Console.WriteLine(data.Id + "  " + data.Name + "  " + data.Emailid + "\n");
+    //    }
+    //}
+
+    //public static void InputConcept(int getvalue, int[] a, Dictionary<int, string> ListMethodSyntax)
+    //{
+    //    Console.WriteLine();
+    //    foreach (var method in ListMethodSyntax)
+    //    {
+    //        Console.WriteLine(method.Key + ": " + method.Value);
+    //    }
+
+    //    Console.Write("Enter your Choice : ");
+    //    switch (getvalue)
+    //    {
+    //        case 1:
+    //            int choice1 = int.Parse(Console.ReadLine());
+    //            MethodSyntax(choice1, a, 1, ListMethodSyntax);
+    //            break;
+    //        case 2:
+    //            int choice = int.Parse(Console.ReadLine());
+    //            MethodSyntax(choice, a, 2, ListMethodSyntax);
+    //            break;
+    //        default:
+    //            Console.WriteLine("Invalid Input");
+    //            break;
+    //    }
+    //}
+    //public static void MethodSyntax(int choice, int[] a, int casechoice, Dictionary<int, string> ListMethodSyntax)
+    //{
+    //    switch (choice)
+    //    {
+    //        case 1:
+    //            if (casechoice == 2)
+    //            {
+    //                var result = a.Where(c => c > 20);
+    //                foreach (var resultdata in result)
+    //                {
+    //                    Console.Write(resultdata + "\t");
+    //                }
+    //                Console.WriteLine();
+    //                int[] array = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
+    //                var response = array.Where(c => c > 5).ToList();
+    //                foreach (var getdata in response)
+    //                {
+    //                    Console.Write(getdata + "\t");
+    //                }
+
+    //            }
+    //            break;
+    //        case 2:
+    //            if (casechoice == 2)
+    //            {
+    //                var result = a.Select(c => c * 2);
+    //                foreach (var getresult in result)
+    //                {
+    //                    Console.Write(getresult + "\t");
+    //                }
+    //                Console.WriteLine();
+    //                int[] array = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
+    //                var response = array.Select(c => c * 5).ToList();
+    //                foreach (var getdata in response)
+    //                {
+    //                    Console.Write(getdata + "\t");
+    //                }
+    //            }
+    //            break;
+    //        case 3:
+    //            if (casechoice == 2)
+    //            {
+    //                var result = a.OrderBy(c => c);
+    //                foreach (var getresult in result)
+    //                {
+    //                    Console.Write(getresult + "\t");
+    //                }
+    //            }
+    //            break;
+    //        case 4:
+    //            if (casechoice == 2)
+    //            {
+    //                var result = a.OrderByDescending(c => c);
+    //                foreach (var getresult in result)
+    //                {
+    //                    Console.Write(getresult + "\t");
+    //                }
+    //            }
+    //            break;
+    //        case 5:
+    //            if (casechoice == 2)
+    //            {
+    //                var result = ListMethodSyntax.OrderByDescending(c => c.Key).ThenBy(x => x.Value);
+    //                foreach (var getresult in result)
+    //                {
+    //                    Console.Write(getresult + "\t");
+    //                }
+    //            }
+    //            break;
+    //        case 6:
+    //            if (casechoice == 2)
+    //            {
+    //                var result = ListMethodSyntax.OrderBy(c => c.Key).ThenByDescending(x => x.Value);
+    //                foreach (var getresult in result)
+    //                {
+    //                    Console.Write(getresult + "\t");
+    //                }
+    //            }
+    //            break;
+    //        case 7:
+    //            if (casechoice == 2)
+    //            {
+    //                var result = ListMethodSyntax.OrderByDescending(a => a.Key).First();
+    //                Console.WriteLine(result);
+    //            }
+    //            break;
+    //        case 8:
+    //            if (casechoice == 2)
+    //            {
+    //                var result = ListMethodSyntax.OrderBy(a => a.Key).FirstOrDefault();
+    //                Console.WriteLine(result);
+    //            }
+    //            break;
+    //        case 9:
+    //            if (casechoice == 2)
+    //            {
+    //                var result = a.OrderBy(c => c).Single(c => c == 546);
+    //                Console.WriteLine(result);
+
+    //                Console.WriteLine();
+
+    //                int[] array = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
+    //                var response = array.Single(c => c == 21);
+    //                Console.WriteLine(response);
+    //            }
+    //            break;
+    //        case 10:
+    //            if (casechoice == 2)
+    //            {
+    //                int[] array = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
+    //                var response = array.SingleOrDefault(c => c == 21);
+    //                Console.WriteLine(response);
+    //            }
+    //            break;
+    //        case 11:
+    //            if (casechoice == 2)
+    //            {
+    //                int[] array = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
+    //                var response = array.All(c => c > 21);
+    //                Console.WriteLine(response);
+    //            }
+    //            break;
+    //        case 12:
+    //            if (casechoice == 2)
+    //            {
+    //                int[] array = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
+    //                var response = array.Any(c => c == 20);
+    //                Console.WriteLine(response);
+    //            }
+    //            break;
+    //        case 13:
+    //            if (casechoice == 2)
+    //            {
+    //                int count = a.Count();
+    //                Console.WriteLine("Count : " + count);
+    //            }
+    //            break;
+    //        case 14:
+    //            if (casechoice == 2)
+    //            {
+    //                int sum = a.Sum();
+    //                Console.WriteLine("Sum : " + sum);
+    //            }
+    //            break;
+    //        case 15:
+    //            if (casechoice == 2)
+    //            {
+    //                int min = a.Min();
+    //                Console.WriteLine("Min : " + min);
+    //            }
+    //            break;
+    //        case 16:
+    //            if (casechoice == 2)
+    //            {
+    //                int max = a.Max();
+    //                Console.WriteLine("Max : " + max);
+    //            }
+    //            break;
+    //        case 17:
+    //            if (casechoice == 2)
+    //            {
+    //                double Average = a.Average();
+    //                Console.WriteLine("Average : " + Average);
+    //            }
+    //            break;
+    //        case 18:
+    //            if (casechoice == 2)
+    //            {
+    //                int[] takedvalue = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    //                int[] taked = takedvalue.Take(3).ToArray();
+    //                foreach (var getdata in taked)
+    //                {
+    //                    Console.Write(getdata + "\t");
+    //                }
+
+    //            }
+    //            break;
+    //        case 19:
+    //            if (casechoice == 2)
+    //            {
+    //                int[] skipvalue = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20];
+    //                int[] skiped = skipvalue.Skip(3).ToArray();
+    //                foreach (var skips in skiped)
+    //                {
+    //                    Console.Write(skips + "\t");
+    //                }
+    //            }
+    //            break;
+    //        case 20:
+    //            if (casechoice == 2)
+    //            {
+    //                int[] distinctvalue = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 14, 10];
+    //                int[] distinct = distinctvalue.Distinct().ToArray();
+
+    //                foreach (var data in distinct)
+    //                {
+    //                    Console.Write(data + ", ");
+    //                }
+    //            }
+    //            break;
+    //        case 21:
+    //            if (casechoice == 2)
+    //            {
+    //                Dictionary<int, string> dicvalue = new Dictionary<int, string>()
+    //                {
+    //                    {1, "Ragul" },
+    //                    {2, "Mani" },
+    //                    {3, "Ragul" },
+    //                    {4, "Kumar" },
+    //                    {5, "Mani" },
+    //                    {6, "Ajay" },
+    //                    {7, "Kumar" },
+    //                    {8, "Ragul" },
+    //                    {9, "Ajay" },
+    //                    {10, "Loki" }
+    //                };
+    //                Console.WriteLine();
+    //                var groupbyresult = dicvalue.Select(y => y.Value).GroupBy(x => x);
+
+    //                foreach (var group in groupbyresult)
+    //                {
+    //                    Console.Write(group.Key + "\n");
+    //                }
+    //            }
+    //            break;
+    //        case 22:
+    //            if (casechoice == 1)
+    //            {
+    //                DataTable dtDept = new DataTable();
+    //                DataTable dtStudent = new DataTable();
+    //                DataTable dtStdEnroll = new DataTable();
+    //                using (SqlConnection sc = new SqlConnection(connectionstring))
+    //                {
+    //                    sc.Open();
+    //                    string query = "select DeptId,DeptName,IsActive from Edu_DepartmentMaster where IsActive =1";
+    //                    string Studentlist = "select StudentId,StudentName,RollNumber,DeptId from Edu_StudentMaster where IsActive =1";
+    //                    string StudentEnroll = "select StudentId, AcademicYear from Edu_StudentEnrollment";
+
+    //                    SqlCommand cmd = new SqlCommand(query, sc);
+    //                    SqlCommand cmd1 = new SqlCommand(Studentlist, sc);
+    //                    SqlCommand cmd2 = new SqlCommand(StudentEnroll, sc);
+
+    //                    SqlDataAdapter reader = new SqlDataAdapter(cmd);
+    //                    SqlDataAdapter reader1 = new SqlDataAdapter(cmd1);
+    //                    SqlDataAdapter reader2 = new SqlDataAdapter(cmd2);
+    //                    reader.Fill(dtDept);
+    //                    reader1.Fill(dtStudent);
+    //                    reader2.Fill(dtStdEnroll);
+
+    //                    var resultdata = dtDept.AsEnumerable();
+    //                    var resultdata1 = dtStudent.AsEnumerable();
+    //                    var resultdata2 = dtStdEnroll.AsEnumerable();
+
+    //                    var getfinalresult = from d in resultdata
+    //                                         join s in resultdata1
+    //                                             on d.Field<int>("DeptId") equals s.Field<int>("DeptId")
+    //                                             into studentdept
+    //                                         from e in studentdept.DefaultIfEmpty()
+
+    //                                             //join se in resultdata2
+    //                                             //on s.Field<int>("StudentId") equals se.Field<int>("StudentId")
+    //                                         where d.Field<bool>("IsActive") == true
+    //                                         select new
+    //                                         {
+    //                                             StudentId = e == null ? 0 : e.Field<int>("StudentId"),
+    //                                             StudentName = e == null ? "No Student" : e.Field<string>("StudentName"),
+    //                                             RollNumber = e == null ? "" : e.Field<string>("RollNumber"),
+
+    //                                             DeptId = d.Field<int>("DeptId"),
+    //                                             DeptName = d.Field<string>("DeptName"),
+
+    //                                             Academicyear = 0
+    //                                         };
+
+    //                    foreach (var finalresult in getfinalresult)
+    //                    {
+    //                        Console.Write(finalresult.StudentId + " " + finalresult.StudentName + " " + finalresult.RollNumber + " " + finalresult.DeptId + " " + finalresult.DeptName + " " + finalresult.Academicyear + "\n");
+    //                    }
+
+    //                    sc.Close();
+    //                }
+    //            }
+    //            else if (casechoice == 2)
+    //            {
+    //                DataTable dtDept = new DataTable();
+    //                DataTable dtStudent = new DataTable();
+    //                using (SqlConnection sc = new SqlConnection(connectionstring))
+    //                {
+    //                    sc.Open();
+    //                    string query = "select DeptId,DeptName,IsActive from Edu_DepartmentMaster where IsActive =1";
+    //                    string Studentlist = "select StudentId,StudentName,RollNumber,DeptId from Edu_StudentMaster where IsActive =1";
+    //                    SqlCommand cmd = new SqlCommand(query, sc);
+    //                    SqlCommand cmd1 = new SqlCommand(Studentlist, sc);
+
+    //                    SqlDataAdapter reader = new SqlDataAdapter(cmd);
+    //                    SqlDataAdapter reader1 = new SqlDataAdapter(cmd1);
+
+    //                    reader.Fill(dtDept);
+    //                    reader1.Fill(dtStudent);
+
+    //                    var resultdata = dtDept.AsEnumerable();
+    //                    var resultdata1 = dtStudent.AsEnumerable();
+    //                    Console.WriteLine("StudentID   StudentName    DeptName  RollNumber");
+    //                    var finalresult = resultdata.Join(resultdata1,
+    //                                         d => d.Field<int>("DeptId"),
+    //                                         s => s.Field<int>("DeptId"),
+    //                                         (d, s) => new
+    //                                         {
+    //                                             DeptId = d.Field<int>("DeptId"),
+    //                                             DeptName = d.Field<string>("DeptName"),
+    //                                             StudentId = s.Field<int>("StudentId"),
+    //                                             StudentName = s.Field<string>("StudentName"),
+    //                                             RollNumber = s.Field<string>("RollNumber")
+
+    //                                         }).OrderBy(x=>x.StudentId);
+
+    //                    foreach (var getdata in finalresult)
+    //                    {
+    //                        Console.Write(getdata.StudentId + " " + getdata.StudentName + " " + getdata.DeptName + " " + getdata.RollNumber+"\n");
+    //                    }
+
+    //                    sc.Close();
+    //                }
+    //            }
+    //            break;
+    //        default:
+    //            Console.WriteLine("Invalid Input");
+    //            break;
+    //    }
+    //}
+    #endregion

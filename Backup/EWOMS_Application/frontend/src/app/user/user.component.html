@@ -1,0 +1,267 @@
+<div class="user-shell">
+  <!-- PREMIUM SIDEBAR -->
+  <aside class="side-nav">
+    <div class="nav-brand">
+      <div class="logo-box">E</div>
+      <span>EWOMS</span>
+    </div>
+
+    <nav class="nav-links">
+      <div class="nav-group">Workspace</div>
+      <a href="#" [class.active]="currentView === 'dashboard'" (click)="setView('dashboard'); $event.preventDefault()">
+        <svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+        Home
+      </a>
+      <a href="#" [class.active]="currentView === 'profile'" (click)="setView('profile'); $event.preventDefault()">
+        <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+        My Profile
+      </a>
+      <a href="#" [class.active]="currentView === 'edit-profile'" (click)="setView('edit-profile'); $event.preventDefault()">
+        <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+        Edit Profile
+      </a>
+      <a href="#" [class.active]="currentView === 'user-posts'" (click)="setView('user-posts'); $event.preventDefault()">
+        <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zM7 10h2v7H7zm4-3h2v10h-2zm4 6h2v4h-2z"/></svg>
+        Community Feed
+      </a>
+      <a href="#" [class.active]="currentView === 'chat'" (click)="setView('chat'); $event.preventDefault()">
+        <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/></svg>
+        Messages
+        <span class="sidebar-unread" *ngIf="unreadCount > 0">{{ unreadCount }}</span>
+      </a>
+
+      <div class="nav-group">Security</div>
+      <a href="#" [class.active]="currentView === 'change-password'" (click)="setView('change-password'); $event.preventDefault()">
+        <svg viewBox="0 0 24 24"><path d="M12.65 10C11.83 7.67 9.61 6 7 6c-3.31 0-6 2.69-6 6s2.69 6 6 6c2.61 0 4.83-1.67 5.65-4H17v4h4v-4h2v-4H12.65zM7 14c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg>
+        Password
+      </a>
+    </nav>
+
+    <div class="nav-footer">
+      <div class="user-pill">
+        <img [src]="profileImage ? profileImage : 'https://ui-avatars.com/api/?name='+(userName || 'U')+'&background=6366f1&color=fff'" 
+             alt="Avatar" (click)="openImagePopup($event)" style="cursor: zoom-in;">
+        <div class="user-info" (click)="setView('profile')" style="flex: 1; cursor: pointer;">
+          <span class="u-name">{{ userName }}</span>
+          <span class="u-status">Member</span>
+        </div>
+      </div>
+      <button class="logout-btn" (click)="logout()">Sign Out</button>
+    </div>
+  </aside>
+
+  <!-- MAIN AREA -->
+  <main class="main-shell">
+    <header class="top-header">
+      <div class="header-breadcrumb">
+        <span>Team Portal</span>
+        <svg viewBox="0 0 24 24" class="chevron"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+        <span class="current-crumb">{{ currentView | titlecase }}</span>
+      </div>
+      
+      <div class="top-actions">
+        <span class="today-text">{{ today | date:'mediumDate' }}</span>
+
+        <!-- NOTIFICATION BELL -->
+        <div class="notification-wrapper">
+          <button class="t-btn" (click)="toggleNotifications($event)">
+            <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+            <span class="n-badge" *ngIf="notificationCount > 0">{{ notificationCount }}</span>
+          </button>
+          
+          <!-- NOTIFICATIONS DROPDOWN -->
+          <div class="notifications-dropdown" *ngIf="notificationsOpen" (click)="$event.stopPropagation()">
+            <div class="nd-header">
+              <h4>Notifications</h4>
+              <button class="nd-mark-all" (click)="markAllNotificationsRead()">Mark all as read</button>
+            </div>
+            
+            <div class="nd-body" *ngIf="notifications.length > 0">
+              <div class="nd-item" *ngFor="let notif of notifications">
+                <div class="nd-icon"><svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg></div>
+                <div class="nd-content">
+                  <p>{{ notif.message || 'You have a new notification.' }}</p>
+                  <span>Just now</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="nd-body empty" *ngIf="notifications.length === 0">
+              <p>You're all caught up!</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="profile-top-pill" (click)="openImagePopup($event)">
+          <div class="top-user-info">
+            <span class="top-u-name">{{ userName || 'User' }}</span>
+            <span class="top-u-role">Team Member</span>
+          </div>
+          <div class="profile-img-wrapper">
+            <img [src]="profileImage ? profileImage : 'https://ui-avatars.com/api/?name='+(userName || 'U')+'&background=6366f1&color=fff'" alt="User Profile">
+            <span class="profile-unread-badge" *ngIf="unreadCount > 0" title="Unread Messages">{{ unreadCount }}</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="view-content" [class.no-padding]="currentView === 'chat'" [class.full-bleed-canvas]="currentView === 'user-posts'" [ngSwitch]="currentView">
+      <!-- DASHBOARD -->
+      <div *ngSwitchCase="'dashboard'" class="fade-in">
+        
+        <div class="view-header">
+          <h2>Hello, {{ userName }}</h2>
+          <p>Explore your performance metrics and active authorizations.</p>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <span class="s-label">Productivity</span>
+            <span class="s-val">98.2%</span>
+            <span class="s-trend up">+4.1%</span>
+          </div>
+          <div class="stat-card">
+            <span class="s-label">Active Tasks</span>
+            <span class="s-val">04</span>
+            <span class="s-trend">Steady</span>
+          </div>
+          <div class="stat-card">
+            <span class="s-label">Security Tier</span>
+            <span class="s-val">Level 4</span>
+            <span class="s-trend success">Verified</span>
+          </div>
+        </div>
+
+        <div class="charts-area">
+          <div class="chart-box main-chart">
+            <div class="box-header">Workload Pattern</div>
+            <div class="box-content">
+              <div class="bar-chart-mock">
+                <!-- Visual mock -->
+                <div class="bar-item" *ngFor="let h of [30, 60, 40, 80, 50, 70, 90]" [style.height.%]="h"></div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="chart-box">
+            <div class="box-header">Skills Distribution</div>
+            <div class="box-content flex-center">
+              <div class="pie-mock"></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- PRIVATE PROFILE VIEW -->
+      <div *ngSwitchCase="'profile'" class="fade-in">
+        <app-user-profile [userId]="currentLoggedInUserId" 
+                          [currentLoggedInUserId]="currentLoggedInUserId"
+                          [isOwn]="true"
+                          (openImage)="openImageFromPost($event)"
+                          (openFollowers)="openFollowers($event)"
+                          (openFollowing)="openFollowing($event)"
+                          (switchToCreatePost)="setView('create-post')"></app-user-profile>
+      </div>
+
+      <!-- PUBLIC PROFILE VIEW -->
+      <div *ngSwitchCase="'view-profile'" class="fade-in">
+        <app-user-profile [userId]="targetUserId" 
+                          [currentLoggedInUserId]="currentLoggedInUserId"
+                          [isOwn]="false"
+                          (viewProfile)="viewPublicProfile($event)"
+                          (openImage)="openImageFromPost($event)"
+                          (openFollowers)="openFollowers($event)"
+                          (openFollowing)="openFollowing($event)"
+                          (switchToChat)="setView('chat')"></app-user-profile>
+      </div>
+
+      <!-- EDIT PROFILE -->
+      <div *ngSwitchCase="'edit-profile'" class="fade-in">
+        <app-user-edit-profile></app-user-edit-profile>
+      </div>
+
+      <!-- COMMUNITY FEED -->
+      <div *ngSwitchCase="'user-posts'">
+        <app-user-posts (viewProfile)="viewPublicProfile($event)" (postCount)="currentPostCount = $event"></app-user-posts>
+      </div>
+
+      <!-- SAVED POSTS -->
+      <div *ngSwitchCase="'saved-posts'">
+        <div class="view-header">
+          <h2>Your Saved Content</h2>
+          <p>Explore stories and contributions you've bookmarked for later.</p>
+        </div>
+        <app-user-contributions [userId]="currentLoggedInUserId" [viewType]="'grid'"></app-user-contributions>
+      </div>
+
+      <!-- CREATE POST -->
+      <div *ngSwitchCase="'create-post'" class="fade-in">
+        <app-create-post></app-create-post>
+      </div>
+
+      <!-- PASSWORD CHANGE -->
+      <div *ngSwitchCase="'change-password'" class="fade-in">
+        <app-change-password></app-change-password>
+      </div>
+
+      <div *ngSwitchCase="'chat'" class="fade-in">
+        <app-chat (back)="setView('dashboard')" (viewProfile)="viewPublicProfile($event)"></app-chat>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- IMAGE PREVIEW MODAL (REALISTIC AMAZON ZOOM) -->
+  <div class="modal-overlay zoom-overlay" *ngIf="activePopupImage" (click)="closeImagePopup()">
+    <div class="image-zoom-modal" (click)="$event.stopPropagation()">
+      <button class="g-close-btn glass" (click)="closeImagePopup()">
+        <i class="bi bi-x-lg"></i>
+      </button>
+      <div class="full-image-container zoom-container" 
+           (mousemove)="onZoomMove($event)" 
+           (mouseenter)="toggleZoom(true)" 
+           (mouseleave)="toggleZoom(false)">
+        <div class="zoom-lens" #zoomLens></div>
+        <img [src]="activePopupImage" alt="Preview Image" #zoomImage (contextmenu)="$event.preventDefault()">
+        <div class="zoom-result" #zoomResult></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOLLOW LIST MODAL -->
+  <div class="modal-overlay" *ngIf="showFollowListModal" (click)="closeFollowList()">
+    <div class="modal-card social-list-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h4>{{ followListTitle }}</h4>
+        <button class="g-close-btn" (click)="closeFollowList()">
+          <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </div>
+      <div class="modal-body user-list-viewport">
+        <div class="user-list-item card-style" *ngFor="let user of followList">
+          <div class="u-avatar-ring" (click)="viewPublicProfile(user.userId); closeFollowList()">
+            <img [src]="getAvatar(user) || 'https://ui-avatars.com/api/?name='+(user.fullName || 'U')+'&background=6366f1&color=fff'" alt="User">
+          </div>
+          <div class="u-info" (click)="viewPublicProfile(user.userId); closeFollowList()">
+            <span class="u-name">{{ user.fullName }}</span>
+            <span class="u-handle">@{{ user.userName || 'member' }}</span>
+          </div>
+          <div class="u-action" *ngIf="user.userId !== currentLoggedInUserId">
+            <button class="list-follow-btn" 
+                    [class.is-following]="user.isFollowing"
+                    (click)="toggleFollowInList(user)">
+              {{ user.isFollowing ? 'Following' : 'Follow' }}
+            </button>
+          </div>
+        </div>
+        
+        <div class="empty-social-state" *ngIf="followList.length === 0">
+          <i class="bi bi-people"></i>
+          <p>No {{ followListTitle.toLowerCase() }} to show yet.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

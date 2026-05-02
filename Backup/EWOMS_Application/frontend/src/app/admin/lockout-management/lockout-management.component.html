@@ -1,0 +1,64 @@
+<div class="view-panel fade-in">
+  <div class="panel-header">
+    <h3>Access Security</h3>
+    <p>Monitor and restore access for accounts locked for security reasons.</p>
+  </div>
+
+  <div class="security-card">
+    <div class="search-section">
+      <div class="f-group">
+        <label>Filter by Lockout Date</label>
+        <div class="input-action">
+          <input type="date" [(ngModel)]="searchDate">
+          <button class="find-btn" (click)="searchLockedUsers()" [disabled]="isLoading || !searchDate">
+            <span *ngIf="!isLoading">Search Lockouts</span>
+            <span *ngIf="isLoading" class="spin-white"></span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="msg-area" *ngIf="successMessage || errorMessage">
+      <div *ngIf="successMessage" class="banner success">{{ successMessage }}</div>
+      <div *ngIf="errorMessage" class="banner error">{{ errorMessage }}</div>
+    </div>
+
+    <div class="result-area">
+      <div *ngIf="!isLoading && lockedUsers.length === 0" class="empty-placeholder">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+        <p>No active lockouts found for the selected date.</p>
+      </div>
+
+      <table class="premium-table" *ngIf="lockedUsers.length > 0">
+        <thead>
+          <tr>
+            <th>Member Account</th>
+            <th>Lockout Expiry</th>
+            <th>Security Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of lockedUsers">
+            <td>
+              <div class="user-cell">
+                <span class="u-email">{{ user.email || user.Email || user.userName }}</span>
+                <span class="u-badge">Locked</span>
+              </div>
+            </td>
+            <td>
+              <span class="time-cell">{{ (user.lockoutEnd || user.LockoutEnd) | date:'medium' }}</span>
+            </td>
+            <td>
+              <button class="restore-btn circle-btn" (click)="releaseLockout(user.email || user.Email || user.userName)" 
+                      [disabled]="actionLoading[user.email || user.Email || user.userName]"
+                      title="Restore Access">
+                <svg *ngIf="!actionLoading[user.email || user.Email || user.userName]" viewBox="0 0 24 24"><path d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM8.9 6c0-1.71 1.39-3.1 3.1-3.1s3.1 1.39 3.1 3.1v2H8.9V6z"/></svg>
+                <span *ngIf="actionLoading[user.email || user.Email || user.userName]" class="spin-white sm"></span>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

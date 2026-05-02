@@ -1,0 +1,55 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.35013.160
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LoginIdentityWebAPI", "LoginIdentityWebAPI\LoginIdentityWebAPI.csproj", "{957F7BEB-314F-4F6F-93F1-A9C0E2976957}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LinqQueries", "LinqQueries\LinqQueries.csproj", "{00497241-B2D4-46D8-9F45-E86E548699D5}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestingCoreMVC", "TestingCoreMVC\TestingCoreMVC.csproj", "{F39CA5A6-8D6B-424A-ABD3-8E8D8D81AF4C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Flightsearchxunit", "Flightsearchxunit\Flightsearchxunit.csproj", "{95774496-234D-4BA0-B11F-4D25720BED49}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CQRSMethodology", "CQRSMethodology\CQRSMethodology.csproj", "{0DC97026-012F-4D77-8264-7739B944D0F1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdentityWebAPI_User", "IdentityWebAPI_User\IdentityWebAPI_User.csproj", "{A97CE344-E7FB-41F1-9370-4CC3562BC63C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{957F7BEB-314F-4F6F-93F1-A9C0E2976957}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{957F7BEB-314F-4F6F-93F1-A9C0E2976957}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{957F7BEB-314F-4F6F-93F1-A9C0E2976957}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{957F7BEB-314F-4F6F-93F1-A9C0E2976957}.Release|Any CPU.Build.0 = Release|Any CPU
+		{00497241-B2D4-46D8-9F45-E86E548699D5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{00497241-B2D4-46D8-9F45-E86E548699D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{00497241-B2D4-46D8-9F45-E86E548699D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{00497241-B2D4-46D8-9F45-E86E548699D5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F39CA5A6-8D6B-424A-ABD3-8E8D8D81AF4C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F39CA5A6-8D6B-424A-ABD3-8E8D8D81AF4C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F39CA5A6-8D6B-424A-ABD3-8E8D8D81AF4C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F39CA5A6-8D6B-424A-ABD3-8E8D8D81AF4C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{95774496-234D-4BA0-B11F-4D25720BED49}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{95774496-234D-4BA0-B11F-4D25720BED49}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{95774496-234D-4BA0-B11F-4D25720BED49}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{95774496-234D-4BA0-B11F-4D25720BED49}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0DC97026-012F-4D77-8264-7739B944D0F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0DC97026-012F-4D77-8264-7739B944D0F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0DC97026-012F-4D77-8264-7739B944D0F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0DC97026-012F-4D77-8264-7739B944D0F1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A97CE344-E7FB-41F1-9370-4CC3562BC63C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A97CE344-E7FB-41F1-9370-4CC3562BC63C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A97CE344-E7FB-41F1-9370-4CC3562BC63C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A97CE344-E7FB-41F1-9370-4CC3562BC63C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {93B9FA9F-7257-4E04-A0FB-4342F1CD2A1A}
+	EndGlobalSection
+EndGlobal

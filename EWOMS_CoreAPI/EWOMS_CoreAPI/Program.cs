@@ -24,7 +24,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 //DB Connection
 
-builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 //-----------//
 
@@ -234,54 +234,45 @@ using (var scope = app.Services.CreateScope())
         }
     }
 
-    // Ensure Backup Tables Exist
+    // Ensure Backup Tables Exist (SQLite Syntax)
     string createBackupTablesSql = @"
-        IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[EWO_MasterUserBackup]') AND type in (N'U'))
-        BEGIN
-            CREATE TABLE [dbo].[EWO_MasterUserBackup] (
-                [Id] INT IDENTITY(1,1) PRIMARY KEY,
-                [UserId] NVARCHAR(450) NOT NULL,
-                [UserName] NVARCHAR(256) NOT NULL,
-                [Email] NVARCHAR(256) NOT NULL,
-                [FullName] NVARCHAR(MAX) NULL,
-                [UserRole] NVARCHAR(MAX) NULL,
-                [CreatedUser] DATETIME2 NULL,
-                [ProfileImage] VARBINARY(MAX) NULL,
-                [DeletedBy] NVARCHAR(MAX) NOT NULL,
-                [DeletedAt] DATETIME2 NOT NULL,
-                [Reason] NVARCHAR(MAX) NULL
-            );
-        END
+        CREATE TABLE IF NOT EXISTS [EWO_MasterUserBackup] (
+            [Id] INTEGER PRIMARY KEY AUTOINCREMENT,
+            [UserId] TEXT NOT NULL,
+            [UserName] TEXT NOT NULL,
+            [Email] TEXT NOT NULL,
+            [FullName] TEXT NULL,
+            [UserRole] TEXT NULL,
+            [CreatedUser] TEXT NULL,
+            [ProfileImage] BLOB NULL,
+            [DeletedBy] TEXT NOT NULL,
+            [DeletedAt] TEXT NOT NULL,
+            [Reason] TEXT NULL
+        );
 
-        IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[EWO_DeleteUserPost]') AND type in (N'U'))
-        BEGIN
-            CREATE TABLE [dbo].[EWO_DeleteUserPost] (
-                [SNo] INT IDENTITY(1,1) PRIMARY KEY,
-                [UId] INT NOT NULL,
-                [UserId] NVARCHAR(450) NOT NULL,
-                [ProfileImage] VARBINARY(MAX) NULL,
-                [Caption] NVARCHAR(MAX) NULL,
-                [CreatedAt] DATETIME2 NOT NULL,
-                [DeletedBy] NVARCHAR(MAX) NOT NULL,
-                [DeletedAt] DATETIME2 NOT NULL,
-                [Reason] NVARCHAR(MAX) NULL
-            );
-        END
+        CREATE TABLE IF NOT EXISTS [EWO_DeleteUserPost] (
+            [SNo] INTEGER PRIMARY KEY AUTOINCREMENT,
+            [UId] INTEGER NOT NULL,
+            [UserId] TEXT NOT NULL,
+            [ProfileImage] BLOB NULL,
+            [Caption] TEXT NULL,
+            [CreatedAt] TEXT NOT NULL,
+            [DeletedBy] TEXT NOT NULL,
+            [DeletedAt] TEXT NOT NULL,
+            [Reason] TEXT NULL
+        );
 
-        IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[EWO_AdminAuditLog]') AND type in (N'U'))
-        BEGIN
-            CREATE TABLE [dbo].[EWO_AdminAuditLog] (
-                [Id] INT IDENTITY(1,1) PRIMARY KEY,
-                [AdminId] NVARCHAR(450) NOT NULL,
-                [AdminName] NVARCHAR(256) NOT NULL,
-                [Action] NVARCHAR(100) NOT NULL,
-                [TargetId] NVARCHAR(450) NULL,
-                [TargetName] NVARCHAR(256) NULL,
-                [Details] NVARCHAR(MAX) NULL,
-                [Timestamp] DATETIME2 NOT NULL,
-                [IpAddress] NVARCHAR(50) NULL
-            );
-        END";
+        CREATE TABLE IF NOT EXISTS [EWO_AdminAuditLog] (
+            [Id] INTEGER PRIMARY KEY AUTOINCREMENT,
+            [AdminId] TEXT NOT NULL,
+            [AdminName] TEXT NOT NULL,
+            [Action] TEXT NOT NULL,
+            [TargetId] TEXT NULL,
+            [TargetName] TEXT NULL,
+            [Details] TEXT NULL,
+            [Timestamp] TEXT NOT NULL,
+            [IpAddress] TEXT NULL
+        );";
     
     await context.Database.ExecuteSqlRawAsync(createBackupTablesSql);
 }

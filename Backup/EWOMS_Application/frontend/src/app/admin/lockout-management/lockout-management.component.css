@@ -1,0 +1,252 @@
+/* === PREMIUM SECURITY & LOCKOUT DESIGN === */
+
+.view-panel {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.panel-header {
+  margin-bottom: 0.5rem;
+}
+
+.panel-header h3 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #1e293b;
+  margin-bottom: 0.25rem;
+}
+
+.panel-header p {
+  color: #64748b;
+  font-size: 0.95rem;
+}
+
+/* SEARCH & FILTER CARD */
+.security-card {
+  background: white;
+  border-radius: 20px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.search-section {
+  padding: 2rem 2.5rem;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.f-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-width: 450px;
+}
+
+.f-group label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #475569;
+}
+
+.input-action {
+  display: flex;
+  gap: 1rem;
+}
+
+.input-action input {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #1e293b;
+  transition: all 0.2s;
+}
+
+.input-action input:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+}
+
+.find-btn {
+  background: #1e293b;
+  color: white;
+  border: none;
+  padding: 0 2rem;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.find-btn:hover:not(:disabled) {
+  background: #0f172a;
+  transform: translateY(-1px);
+}
+
+.find-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* MESSAGE BANNERS */
+.msg-area {
+  padding: 0 2.5rem;
+  margin-top: 1.5rem;
+}
+
+.banner {
+  padding: 0.75rem 1.25rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.banner.success { 
+  background: #ecfdf5; 
+  color: #059669; 
+  border: 1px solid #10b981; 
+}
+
+.banner.error { 
+  background: #fef2f2; 
+  color: #dc2626; 
+  border: 1px solid #ef4444; 
+}
+
+/* RESULTS TABLE */
+.result-area {
+  padding: 0;
+}
+
+.empty-placeholder {
+  padding: 6rem 0;
+  text-align: center;
+  color: #94a3b8;
+}
+
+.empty-placeholder svg {
+  width: 56px;
+  height: 56px;
+  stroke: #e2e8f0;
+  fill: none;
+  margin-bottom: 1rem;
+}
+
+.premium-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.premium-table th {
+  background: #f8fafc;
+  padding: 1rem 2.5rem;
+  text-align: left;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #64748b;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.premium-table td {
+  padding: 1.25rem 2.5rem;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+}
+
+.user-cell {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.u-email {
+  font-weight: 700;
+  color: #0f172a;
+  font-size: 0.95rem;
+}
+
+.u-badge {
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  background: #fef2f2;
+  color: #ef4444;
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid #fee2e2;
+}
+
+.time-cell {
+  font-size: 0.9rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.restore-btn {
+  background: #6366f1;
+  color: white;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  padding: 0;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.2);
+}
+
+.restore-btn svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+
+.restore-btn:hover:not(:disabled) {
+  background: #4f46e5;
+  transform: scale(1.1) rotate(-10deg);
+  box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3);
+}
+
+.spin-white.sm {
+  width: 16px;
+  height: 16px;
+  border-width: 2px;
+}
+
+.spin-white, .spin-indigo {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.spin-indigo {
+  border-color: rgba(99, 102, 241, 0.2);
+  border-top-color: #6366f1;
+}
+
+@keyframes spin { 
+  to { transform: rotate(360deg); } 
+}

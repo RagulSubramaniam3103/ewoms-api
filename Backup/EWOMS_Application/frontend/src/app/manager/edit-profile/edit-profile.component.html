@@ -1,0 +1,106 @@
+<div class="simple-profile-wrapper fade-in">
+  <div class="simple-header">
+    <h2>Edit Profile</h2>
+    <p>Update your personal and contact details.</p>
+  </div>
+
+  <form (ngSubmit)="onSubmit()" #profileForm="ngForm" class="simple-form">
+    <div class="form-layout">
+      
+      <!-- LEFT COLUMN -->
+      <div class="form-col">
+        <div class="avatar-group">
+          <div class="avatar-preview">
+            <img [src]="imagePreview || 'https://ui-avatars.com/api/?name=Manager&background=6366f1&color=fff'" alt="Avatar">
+            <label for="imgUpload" class="edit-btn">
+              <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+            </label>
+            <input type="file" id="imgUpload" (change)="onFileSelected($event)" hidden accept="image/*">
+          </div>
+          <div class="avatar-text">
+            <span>Profile Photo</span>
+            <small>JPG, PNG max 2MB</small>
+          </div>
+        </div>
+
+        <div class="s-input-group">
+          <label>Full Name</label>
+          <input type="text" [(ngModel)]="profileData.FullName" name="FullName" required>
+        </div>
+
+        <div class="s-input-group">
+          <label>Username</label>
+          <input type="text" [(ngModel)]="profileData.UserName" name="UserName" required>
+        </div>
+
+        <div class="s-input-group">
+          <label>Email Address</label>
+          <input type="email" [(ngModel)]="profileData.Email" name="Email" readonly class="readonly">
+        </div>
+
+        <div class="privacy-toggle-box">
+          <div class="toggle-info">
+            <span class="toggle-title">Account Privacy</span>
+            <span class="toggle-desc">Switch to private to control who sees your activity.</span>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" [(ngModel)]="profileData.IsPrivate" name="IsPrivate">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN -->
+      <div class="form-col">
+        <div class="s-input-group">
+          <label>Phone Number</label>
+          <input type="text" [(ngModel)]="profileData.PhoneNumber" name="PhoneNumber">
+        </div>
+
+        <div class="s-input-group">
+          <label>Address Line 1</label>
+          <input type="text" [(ngModel)]="profileData.Address1" name="Address1">
+        </div>
+
+        <div class="s-input-group">
+          <label>Address Line 2</label>
+          <input type="text" [(ngModel)]="profileData.Address2" name="Address2">
+        </div>
+
+        <div class="s-row">
+          <div class="s-input-group">
+            <label>City</label>
+            <input type="text" [(ngModel)]="profileData.City" name="City">
+          </div>
+          <div class="s-input-group">
+            <label>State</label>
+            <input type="text" [(ngModel)]="profileData.State" name="State">
+          </div>
+        </div>
+
+        <div class="s-row">
+          <div class="s-input-group">
+            <label>Postal Code</label>
+            <input type="text" [(ngModel)]="profileData.PostalCode" name="PostalCode">
+          </div>
+          <div class="s-input-group">
+            <label>Country</label>
+            <input type="text" [(ngModel)]="profileData.Country" name="Country">
+          </div>
+        </div>
+      </div>
+    
+    </div>
+
+    <div class="form-footer">
+      <div class="status-msg">
+         <div *ngIf="successMsg" class="alert success">{{ successMsg }}</div>
+         <div *ngIf="errorMsg" class="alert error">{{ errorMsg }}</div>
+      </div>
+      <button type="submit" class="s-btn-save" [disabled]="isLoading">
+        <span *ngIf="!isLoading">Save Changes</span>
+        <span *ngIf="isLoading" class="spinner"></span>
+      </button>
+    </div>
+  </form>
+</div>

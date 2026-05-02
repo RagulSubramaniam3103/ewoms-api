@@ -1,0 +1,115 @@
+<div class="moderation-console fade-in">
+  <!-- CONSOLE HEADER (UNCHANGED) -->
+  <div class="console-header">
+    <div class="header-left">
+      <div class="header-badge">Control Center</div>
+      <h2>Content Moderation</h2>
+      <p>Screen community posts with a full-frame focus.</p>
+    </div>
+    
+    <div class="header-right">
+      <div class="filter-pills">
+        <button [class.active]="activeTab === 'pending'" (click)="setTab('pending')">
+          Active Feed <span class="pill-count">{{ activePosts.length }}</span>
+        </button>
+        <button [class.active]="activeTab === 'archived'" (click)="setTab('archived')">
+          Archive Log <span class="pill-count">{{ archivedCount }}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MONITORING GRID -->
+  <div class="monitoring-grid">
+    <div class="monitor-card" *ngFor="let post of filteredPosts">
+      <div class="card-viewport" (click)="openDetail(post)">
+        <img [src]="'data:image/jpeg;base64,' + post.displayImage" alt="Post Image" [class.blurred]="post.isBlurred">
+        <div class="blur-indicator" *ngIf="post.isBlurred">
+          <svg viewBox="0 0 24 24" width="32" class="eye-glow"><path fill="white" d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+          <span class="indicator-text">Filtered</span>
+        </div>
+      </div>
+      
+      <div class="card-details">
+        <div class="user-meta">
+          <span class="u-name">{{ post.userName }}</span>
+          <span class="u-date">{{ post.createdAt | date:'shortTime' }}</span>
+        </div>
+        <p class="u-caption">{{ post.caption | slice:0:60 }}{{ post.caption.length > 60 ? '...' : '' }}</p>
+        
+        <div class="card-actions">
+          <button class="act-btn blur" [class.is-active]="post.isBlurred" (click)="toggleBlur(post)">
+            <svg viewBox="0 0 24 24" width="16"><path fill="currentColor" d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+            {{ post.isBlurred ? 'Lift Filter' : 'Blur' }}
+          </button>
+          <button class="act-btn archive" (click)="archivePost(post)" *ngIf="activeTab === 'pending'">
+            <svg viewBox="0 0 24 24" width="16"><path fill="currentColor" d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+            Archive
+          </button>
+          <div class="archive-badge" *ngIf="activeTab === 'archived'">Archived</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONSOLE PAGINATION -->
+  <div class="console-pagination" *ngIf="totalPages > 1">
+    <div class="pg-info">
+      Showing <span>{{ (currentPage - 1) * pageSize + 1 }}</span> - 
+      <span>{{ Math.min(currentPage * pageSize, totalItems) }}</span> of 
+      <span>{{ totalItems }}</span> Records
+    </div>
+    <div class="pg-controls">
+      <button class="pg-btn" [disabled]="currentPage === 1" (click)="setPage(currentPage - 1)">
+        <svg viewBox="0 0 24 24" width="18"><path fill="currentColor" d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/></svg>
+        Prev
+      </button>
+      
+      <div class="pg-pages">
+        <button *ngFor="let p of [].constructor(totalPages); let i = index" 
+                class="page-num" 
+                [class.active]="currentPage === (i + 1)"
+                (click)="setPage(i + 1)">
+          {{ i + 1 }}
+        </button>
+      </div>
+
+      <button class="pg-btn" [disabled]="currentPage === totalPages" (click)="setPage(currentPage + 1)">
+        Next
+        <svg viewBox="0 0 24 24" width="18"><path fill="currentColor" d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- PURE VISUAL REVIEWER (IMAGE ONLY) -->
+<div class="screening-modal" *ngIf="selectedPost" (click)="closeDetail()">
+  <div class="reviewer-console" (click)="$event.stopPropagation()">
+    <button class="modal-close-fixed" (click)="closeDetail()">×</button>
+    
+    <!-- PURE IMAGE VIEWPORT -->
+    <div class="reviewer-viewport">
+      <img [src]="'data:image/jpeg;base64,' + selectedPost.displayImage" alt="Full Image Review">
+    </div>
+  </div>
+</div>
+
+<!-- ARCHIVE REASON MODAL (UNCHANGED) -->
+<div class="archive-reason-modal" *ngIf="showDeleteModal" (click)="closeArchiveModal()">
+  <div class="reason-card" (click)="$event.stopPropagation()">
+    <div class="reason-header">
+      <div class="alert-icon">!</div>
+      <h3>Archive Post</h3>
+    </div>
+    <div class="reason-body">
+      <p>Please specify the reason for archiving this community post.</p>
+      <textarea [(ngModel)]="deleteReason" placeholder="e.g., Policy violation, Inappropriate content..."></textarea>
+    </div>
+    <div class="reason-footer">
+      <button class="r-btn cancel" (click)="closeArchiveModal()">Cancel</button>
+      <button class="r-btn confirm" (click)="confirmArchive()" [disabled]="isArchiving">
+        {{ isArchiving ? 'Archiving...' : 'Confirm' }}
+      </button>
+    </div>
+  </div>
+</div>
