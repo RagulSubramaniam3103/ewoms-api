@@ -1,0 +1,6 @@
+@EWOMS_CoreAPI_HostAddress = http://localhost:5009
+
+GET {{EWOMS_CoreAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
