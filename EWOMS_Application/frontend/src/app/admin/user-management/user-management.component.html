@@ -1,0 +1,156 @@
+<div class="view-panel fade-in">
+  <!-- ELITE DIRECTORY HEADER -->
+  <header class="directory-header">
+    <div class="dir-title-group">
+      <h3>People Directory</h3>
+      <p>Synchronize and manage all personnel across the organization.</p>
+    </div>
+
+    <nav class="dir-nav-tabs">
+      <div class="tabs-scroll-area">
+        <ng-container *ngIf="defaultTab !== 'Deleted'">
+          <button [class.active]="selectedRole === 'Admin'" (click)="onRoleChange('Admin')">Admins</button>
+          <button [class.active]="selectedRole === 'Manager'" (click)="onRoleChange('Manager')">Managers</button>
+          <button [class.active]="selectedRole === 'User'" (click)="onRoleChange('User')">Users</button>
+        </ng-container>
+        <button *ngIf="defaultTab === 'Deleted'" [class.active]="selectedRole === 'Deleted'" (click)="onRoleChange('Deleted')">Deleted Records</button>
+      </div>
+    </nav>
+  </header>
+
+  <div class="directory-body">
+    <!-- REFINED SEARCH & FILTER -->
+    <div class="dir-toolbar">
+      <div class="search-nexus">
+        <i class="bi bi-search"></i>
+        <input type="text" placeholder="Search members..." [(ngModel)]="searchTerm" (input)="onSearchChange()">
+      </div>
+
+      <div class="dir-pagination">
+        <div class="page-selector">
+          <button (click)="prevPage()" [disabled]="currentPage === 1"><i class="bi bi-chevron-left"></i></button>
+          <span class="p-info">Page {{ currentPage }} / {{ totalPages }}</span>
+          <button (click)="nextPage()" [disabled]="currentPage === totalPages"><i class="bi bi-chevron-right"></i></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ELITE TABLE -->
+    <div class="table-container-elite">
+      <div *ngIf="isLoading" class="loader-box">
+        <div class="spinner-nexus"></div>
+        <p>Syncing Directory...</p>
+      </div>
+
+      <table class="elite-data-table" *ngIf="!isLoading && users.length > 0">
+        <thead>
+          <tr>
+            <th>Profile</th>
+            <th>Contact</th>
+            <th>Security</th>
+            <th>Status</th>
+            <th class="text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <ng-container *ngFor="let user of paginatedUsers; let i = index">
+            <tr class="elite-row" [class.expanded]="expandedUserId === (user.userId || user.id || user.UserId)" (click)="toggleDetails(user)">
+              <td class="profile-cell">
+                <div class="member-profile" (click)="openImagePopup(user, $event)">
+                  <div class="member-avatar">
+                    <img [src]="(user.profileImage || user.ProfileImage) ? 'data:image/webp;base64,' + (user.profileImage || user.ProfileImage) : 'https://ui-avatars.com/api/?name=' + (user.userName || user.username) + '&background=f1f5f9&color=6366f1'" alt="Avatar">
+                  </div>
+                  <div class="member-meta">
+                    <span class="m-name">{{ user.userName || user.username }}</span>
+                    <span class="m-full">{{ user.fullName }}</span>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="contact-nexus">
+                  <div class="c-node"><i class="bi bi-envelope"></i> {{ user.email }}</div>
+                  <div class="c-node"><i class="bi bi-phone"></i> {{ user.phoneNumber || 'N/A' }}</div>
+                </div>
+              </td>
+              <td>
+                <div class="role-management" *ngIf="selectedRole !== 'Deleted'">
+                  <select [ngModel]="selectedRole" (change)="changeUserRole(user.id || user.UserId, $any($event.target).value)" class="elite-select">
+                    <option value="User">User</option>
+                    <option value="Manager">Manager</option>
+                    <option value="Admin">Admin</option>
+                  </select>
+                </div>
+                <div class="deleted-log" *ngIf="selectedRole === 'Deleted'">
+                  <span class="log-admin">{{ user.deletedBy }}</span>
+                  <small>{{ user.deletedAt | date:'shortDate' }}</small>
+                </div>
+              </td>
+              <td>
+                <div class="status-zone" *ngIf="selectedRole !== 'Deleted'">
+                  <span class="badge-live">Active</span>
+                </div>
+                <div class="deleted-log" *ngIf="selectedRole === 'Deleted'">
+                  <span class="log-admin">{{ user.deletedBy }}</span>
+                  <small>{{ user.deletedAt | date:'shortDate' }}</small>
+                </div>
+              </td>
+              <td class="text-right">
+                <div class="action-tray">
+                  <button *ngIf="selectedRole !== 'Deleted'" class="btn-action-circle danger" (click)="$event.stopPropagation(); deleteUser(user.id || user.UserId)">
+                    <i class="bi bi-trash3"></i>
+                  </button>
+                  <button class="btn-action-circle primary">
+                    <i class="bi" [class.bi-chevron-down]="expandedUserId !== (user.userId || user.id || user.UserId)" [class.bi-chevron-up]="expandedUserId === (user.userId || user.id || user.UserId)"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- ARCHIVE PANEL -->
+            <tr *ngIf="expandedUserId === (user.userId || user.id || user.UserId)" class="archive-row">
+              <td colspan="5">
+                <div class="archive-expanded fade-in">
+                  <!-- ACTIVE USER DETAILS -->
+                  <div class="detail-grid-master" *ngIf="selectedRole !== 'Deleted'">
+                    <div class="d-card">
+                      <span class="d-label">Security Clearance</span>
+                      <span class="d-value">{{ selectedRole }} Level</span>
+                    </div>
+                    <div class="d-card">
+                      <span class="d-label">Deployment Region</span>
+                      <span class="d-value">{{ user.city || 'Remote' }}, {{ user.country || 'Global' }}</span>
+                    </div>
+                    <div class="d-card">
+                      <span class="d-label">Identity Hash</span>
+                      <span class="d-value">{{ user.id || user.UserId }}</span>
+                    </div>
+                  </div>
+
+                  <!-- DELETED POSTS (For Deleted Tab) -->
+                  <div *ngIf="selectedRole === 'Deleted'">
+                    <div class="archive-header-mini">Archived Records: {{ user.userName }}</div>
+                    <div class="archive-grid-mini">
+                      <div class="a-item" *ngFor="let post of userDeletedPosts" (click)="openImagePopup(post, $event)">
+                        <img *ngIf="post.profileImage" [src]="'data:image/webp;base64,' + post.profileImage">
+                      </div>
+                    </div>
+                    <div *ngIf="isLoadingPosts" class="archive-loading">Retrieving assets...</div>
+                    <div *ngIf="!isLoadingPosts && userDeletedPosts.length === 0" class="archive-empty">No archived posts.</div>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </ng-container>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- INSTAGRAM-STYLE IMAGE VIEWER POPUP -->
+<div class="modal-overlay-elite" *ngIf="activePopupImage" (click)="closeImagePopup()">
+  <div class="viewer-card-elite" (click)="$event.stopPropagation()">
+    <button class="btn-close-viewer" (click)="closeImagePopup()"><i class="bi bi-x-lg"></i></button>
+    <div class="viewer-media"><img [src]="activePopupImage" alt="Preview"></div>
+  </div>
+</div>

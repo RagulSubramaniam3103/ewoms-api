@@ -1,0 +1,167 @@
+<div class="insta-profile-container fade-in" *ngIf="user">
+  <!-- TOP SECTION: IDENTITY & STATS -->
+  <header class="insta-header">
+    <div class="insta-avatar-col">
+      <div class="insta-avatar-ring" [class.has-story]="userStories.length > 0"
+           (mousedown)="onAvatarMouseDown($event)" 
+           (mouseup)="onAvatarMouseUp()" 
+           (mouseleave)="onAvatarMouseLeave()"
+           (click)="onAvatarClick()">
+        <img [src]="getAvatar(user) || 'https://ui-avatars.com/api/?name='+(user.fullName || 'U')+'&background=4338ca&color=fff'" 
+             alt="Avatar" draggable="false">
+      </div>
+    </div>
+    
+    <div class="insta-info-col">
+      <div class="insta-name-row">
+        <div class="name-status-group">
+          <h2 class="insta-username">{{ user.fullName }}</h2>
+          <span class="role-badge-elite" *ngIf="role === 'admin'" title="Administrative Clearance">
+            <i class="bi bi-patch-check-fill"></i> ADMIN
+          </span>
+          <span class="role-badge-elite manager" *ngIf="role === 'manager'" title="Management Clearance">
+            <i class="bi bi-shield-shaded"></i> MANAGER
+          </span>
+        </div>
+        <div class="insta-actions">
+          <ng-container *ngIf="!isOwn">
+            <button class="btn-insta-primary" [class.is-following]="isFollowing" [class.is-requested]="isRequested" (click)="toggleFollow()">
+              {{ isFollowing ? 'Following' : (isRequested ? 'Requested' : 'Follow') }}
+            </button>
+            <button class="btn-insta-secondary" (click)="switchToChat.emit()">Message</button>
+          </ng-container>
+          <button class="btn-insta-secondary" (click)="triggerEditProfile()" *ngIf="isOwn">Edit Profile</button>
+          <button class="btn-insta-icon"><i class="bi bi-three-dots"></i></button>
+        </div>
+      </div>
+
+      <div class="insta-stats-row">
+        <div class="insta-stat">
+          <span class="stat-count">{{ currentPostCount }}</span> posts
+        </div>
+        <div class="insta-stat clickable" (click)="triggerFollowers()">
+          <span class="stat-count">{{ followersCount }}</span> followers
+        </div>
+        <div class="insta-stat clickable" (click)="triggerFollowing()">
+          <span class="stat-count">{{ followingCount }}</span> following
+        </div>
+      </div>
+
+      <div class="insta-bio-row">
+        <h3 class="insta-display-name">{{ user.fullName }}</h3>
+        <p class="insta-bio-text">Global Operations Lead @ EWOMS. Building the future of unified intelligence. 🚀</p>
+        <a href="#" class="insta-link">www.ewoms-nexus.com</a>
+      </div>
+    </div>
+  </header>
+
+
+  <!-- CONTENT VIEWPORT -->
+  <div class="insta-content-viewport">
+    <div class="profile-layout-main">
+      <div class="profile-left-col">
+        <nav class="insta-tabs">
+          <button [class.active]="activeProfileTab === 'posts'" (click)="setProfileTab('posts')">
+            <i class="bi bi-grid-3x3"></i> POSTS
+          </button>
+          <button [class.active]="activeProfileTab === 'saved'" (click)="setProfileTab('saved')" *ngIf="isOwn">
+            <i class="bi bi-bookmark"></i> SAVED
+          </button>
+          <button [class.active]="activeProfileTab === 'activity'" (click)="setProfileTab('activity')">
+            <i class="bi bi-clock-history"></i> ACTIVITY
+          </button>
+        </nav>
+
+        <div *ngIf="activeProfileTab === 'posts'" class="insta-grid-view slide-up">
+          <app-social-contributions [userId]="isOwn ? currentLoggedInUserId : user.userId" 
+                                     [viewType]="'grid'" [mode]="'posts'"></app-social-contributions>
+        </div>
+        
+        <div *ngIf="activeProfileTab === 'saved'" class="insta-grid-view slide-up">
+          <app-social-contributions [userId]="currentLoggedInUserId" 
+                                     [viewType]="'grid'" [mode]="'saved'"></app-social-contributions>
+        </div>
+
+        <div *ngIf="activeProfileTab === 'activity'" class="insta-activity-view slide-up">
+          <div class="activity-list">
+            <div class="activity-item">
+              <div class="activity-icon"><i class="bi bi-check-circle-fill"></i></div>
+              <div class="activity-details">
+                <p><strong>Identity Verified</strong> • 2h</p>
+                <span>Your neural verification was successful.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT SIDEBAR: FOLLOWERS -->
+      <aside class="profile-right-col glass-panel">
+        <div class="sidebar-sec">
+          <div class="sec-header">
+            <span>Personnel Connections</span>
+            <button class="btn-text-tiny" (click)="triggerFollowers()">View All</button>
+          </div>
+          
+          <div class="sidebar-scroll-nexus">
+            <div class="follower-item-mini" *ngFor="let f of followersList">
+              <div class="f-info-mini" (click)="triggerViewProfile(f.userId)">
+                <img [src]="getAvatar(f) || 'https://ui-avatars.com/api/?name='+f.fullName+'&background=f1f5f9&color=6366f1'" alt="Personnel">
+                <div class="f-meta-mini">
+                  <span class="f-name-mini">{{ f.fullName }}</span>
+                  <span class="f-role-mini">Personnel</span>
+                </div>
+              </div>
+              <button class="btn-follow-mini" (click)="toggleFollowInList(f)" *ngIf="f.userId !== currentLoggedInUserId">
+                {{ f.isFollowing ? 'Following' : 'Follow' }}
+              </button>
+            </div>
+            
+            <div class="empty-mini-state" *ngIf="!isLoadingFollowers && followersList.length === 0">
+              <p>No active connections found.</p>
+            </div>
+            <div class="loader-mini" *ngIf="isLoadingFollowers">
+              <div class="spinner-mini"></div>
+            </div>
+          </div>
+        </div>
+
+        <footer class="profile-mini-footer">
+          <p>&copy; 2026 MOMENTUM SYSTEM</p>
+        </footer>
+      </aside>
+    </div>
+  </div>
+</div>
+
+<!-- SIMPLE LOADER -->
+<div class="insta-loader" *ngIf="!user">
+  <div class="insta-spinner"></div>
+</div>
+
+<!-- STORY POPUP (Triggered by Long-Press) -->
+<div class="story-viewer-overlay fixed-overlay" *ngIf="activeStory" (click)="closeStoryPopup()">
+  <div class="story-viewer-card glass-panel" (click)="$event.stopPropagation()">
+    <div class="story-viewer-header">
+      <div class="v-user">
+        <img [src]="activeStory.userImage" alt="User">
+        <span>{{ activeStory.userName }}</span>
+      </div>
+      <div class="story-progress-bar">
+        <div class="progress-segment" *ngFor="let seg of activeStory.segments; let i = index">
+          <div class="progress-fill" [style.width]="i < activeStory.currentSegmentIndex ? '100%' : (i === activeStory.currentSegmentIndex ? '0%' : '0%')"
+               [class.active-fill]="i === activeStory.currentSegmentIndex"></div>
+        </div>
+      </div>
+      <button class="v-close" (click)="closeStoryPopup()">×</button>
+    </div>
+    <div class="story-viewer-content">
+      <img [src]="activeStory.segments[activeStory.currentSegmentIndex].displayImage.startsWith('data:') ? activeStory.segments[activeStory.currentSegmentIndex].displayImage : 'data:image/jpeg;base64,' + activeStory.segments[activeStory.currentSegmentIndex].displayImage" 
+           alt="Story" class="main-story-img">
+      
+      <div class="story-caption-overlay" *ngIf="activeStory.segments[activeStory.currentSegmentIndex].caption">
+        <p>{{ activeStory.segments[activeStory.currentSegmentIndex].caption }}</p>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,236 @@
+<div class="main-shell">
+  <!-- ELITE MINIMALIST SIDEBAR -->
+  <aside class="side-nav-clean">
+    <div class="nav-brand">
+      <div class="brand-logo">
+        <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <span class="brand-name">EWOMS</span>
+    </div>
+
+    <nav class="nav-links-clean">
+      <div class="nav-section-label">Explore</div>
+      <a href="#" [class.active]="currentView === 'community-feed'" (click)="setView('community-feed'); $event.preventDefault()">
+        <i class="bi bi-grid-3x3-gap"></i> Feed
+      </a>
+      <a href="#" [class.active]="currentView === 'chat'" (click)="setView('chat'); $event.preventDefault()">
+        <i class="bi bi-chat-dots"></i> Messages
+        <span class="unread-badge-mini" *ngIf="unreadCount > 0">{{ unreadCount }}</span>
+      </a>
+      <a href="#" [class.active]="currentView === 'create-post'" (click)="setView('create-post'); $event.preventDefault()">
+        <i class="bi bi-plus-square"></i> Create
+      </a>
+
+      <div class="nav-section-label">Personal</div>
+      <a href="#" [class.active]="currentView === 'profile'" (click)="setView('profile'); $event.preventDefault()">
+        <i class="bi bi-person"></i> Identity
+      </a>
+      <a href="#" [class.active]="currentView === 'edit-profile'" (click)="setView('edit-profile'); $event.preventDefault()">
+        <i class="bi bi-pencil-square"></i> Edit Profile
+      </a>
+      <a href="#" [class.active]="currentView === 'change-password'" (click)="setView('change-password'); $event.preventDefault()">
+        <i class="bi bi-shield-lock"></i> Security
+      </a>
+    </nav>
+
+    <div class="nav-footer">
+      <button class="btn-logout-clean" (click)="logout()">
+        <i class="bi bi-box-arrow-left"></i> Logout
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN VIEWPORT -->
+  <main class="viewport-clean">
+    <!-- APP HEADER -->
+    <header class="app-header-clean">
+      <div class="header-search">
+        <i class="bi bi-search"></i>
+        <input type="text" placeholder="Search community...">
+      </div>
+
+      <div class="header-controls">
+        <div class="ctrl-icon" (click)="toggleNotifications($event)">
+          <i class="bi bi-bell"></i>
+          <span class="badge-dot" *ngIf="notificationCount > 0"></span>
+        </div>
+        
+        <div class="profile-pill-clean" (click)="setView('profile')">
+          <img [src]="profileImage || 'https://ui-avatars.com/api/?name='+(userName || 'U')+'&background=f1f5f9&color=6366f1'" alt="Avatar" class="pill-avatar">
+          <span class="pill-name">{{ userName || 'User' }}</span>
+        </div>
+      </div>
+
+      <!-- NOTIFICATIONS DROPDOWN -->
+      <div class="notifications-dropdown-elite fade-in" *ngIf="notificationsOpen" (click)="$event.stopPropagation()">
+        <div class="nd-header-elite">
+          <h4>Notifications</h4>
+          <button (click)="markAllNotificationsRead()">Mark all read</button>
+        </div>
+        <div class="nd-body-elite custom-scroll">
+          <div class="nd-item-elite" *ngFor="let n of notifications">
+            <div class="nd-icon-box"><i class="bi bi-info-circle"></i></div>
+            <div class="nd-text-box">
+              <span class="nd-title-text">{{ n.title }}</span>
+              <p class="nd-msg-text">{{ n.message }}</p>
+              <small>{{ n.timestamp | date:'shortTime' }}</small>
+            </div>
+          </div>
+          <div class="nd-empty-elite" *ngIf="notifications.length === 0">
+            <i class="bi bi-check2-circle"></i>
+            <p>All caught up!</p>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- DYNAMIC CONTENT -->
+    <div class="view-content-clean fade-in" 
+         [class.no-padding]="currentView === 'community-feed' || currentView === 'user-posts' || currentView === 'chat'"
+         [ngSwitch]="currentView">
+      
+      <div *ngSwitchCase="'community-feed'" class="feed-layout-container" style="flex: 1; display: flex; width: 100%; max-width: none; overflow-y: auto;">
+        <div class="feed-main-col">
+          <app-community-feed [userAvatar]="profileImage" (openImage)="openImageFromPost($event)" (viewProfile)="viewPublicProfile($event)"></app-community-feed>
+        </div>
+        
+        <aside class="feed-right-col glass-panel">
+          <div class="right-section">
+            <div class="section-header">
+              <span>Suggested for you</span>
+              <button class="btn-text">See All</button>
+            </div>
+            <div class="suggested-list">
+              <div class="suggested-item" *ngFor="let u of suggestedUsers">
+                <img [src]="getAvatar(u) || 'https://ui-avatars.com/api/?name=' + u.fullName + '&background=f1f5f9&color=6366f1'" 
+                     alt="Personnel" (click)="viewPublicProfile(u.userId)">
+                <div class="s-info" (click)="viewPublicProfile(u.userId)">
+                  <span class="s-name">{{ u.fullName }}</span>
+                  <span class="s-meta">@{{ u.userName || 'Member' }}</span>
+                </div>
+                <button class="btn-follow-mini" (click)="toggleFollowInList(u)">
+                  {{ u.isFollowing ? 'Unfollow' : 'Follow' }}
+                </button>
+              </div>
+              <div *ngIf="suggestedUsers.length === 0" style="padding: 20px; text-align: center; color: #94a3b8; font-size: 13px;">
+                No personnel suggestions available.
+              </div>
+            </div>
+          </div>
+
+          <div class="right-section">
+            <div class="section-header">
+              <span>Operational Analytics</span>
+            </div>
+            <div class="analytics-card-mini">
+              <div class="a-metric">
+                <span class="m-val">128</span>
+                <span class="m-lbl">Daily Broadcasts</span>
+              </div>
+            </div>
+          </div>
+          
+          <footer class="right-footer-links">
+            <p>&copy; 2026 EWOMS ENTERPRISE SYSTEM</p>
+          </footer>
+        </aside>
+      </div>
+
+      <div *ngSwitchCase="'user-posts'" style="flex: 1; display: flex; flex-direction: column; width: 100%;">
+        <app-user-posts [role]="'user'" [userAvatar]="profileImage" (viewProfile)="viewPublicProfile($event)" (openImage)="openImageFromPost($event)" (postCount)="currentPostCount = $event"></app-user-posts>
+      </div>
+
+      <div *ngSwitchCase="'chat'" style="flex: 1; display: flex; flex-direction: column;">
+        <app-chat (back)="setView('user-posts')" (viewProfile)="viewPublicProfile($event)" (unreadCountChanged)="loadUnreadCount()"></app-chat>
+      </div>
+
+      <div *ngSwitchCase="'create-post'">
+        <app-create-post></app-create-post>
+      </div>
+
+      <div *ngSwitchCase="'profile'">
+        <app-user-profile [userId]="currentLoggedInUserId" 
+                          [currentLoggedInUserId]="currentLoggedInUserId"
+                          [isOwn]="true"
+                          [role]="userRole"
+                          (viewProfile)="viewPublicProfile($event)"
+                          (openImage)="openImageFromPost($event)"
+                          (openFollowers)="openFollowers($event)"
+                          (openFollowing)="openFollowing($event)"
+                          (switchToChat)="setView('chat')"
+                          (switchToCreatePost)="setView('create-post')"
+                          (switchToEditProfile)="setView('edit-profile')"></app-user-profile>
+      </div>
+
+      <div *ngSwitchCase="'edit-profile'">
+        <app-user-edit-profile></app-user-edit-profile>
+      </div>
+
+      <div *ngSwitchCase="'change-password'">
+        <app-change-password></app-change-password>
+      </div>
+
+      <!-- PUBLIC PROFILE VIEW -->
+      <div *ngSwitchCase="'view-profile'">
+        <app-user-profile [userId]="targetUserId" 
+                          [currentLoggedInUserId]="currentLoggedInUserId"
+                          [isOwn]="false"
+                          [role]="userRole"
+                          (viewProfile)="viewPublicProfile($event)"
+                          (openImage)="openImageFromPost($event)"
+                          (openFollowers)="openFollowers($event)"
+                          (openFollowing)="openFollowing($event)"
+                          (switchToChat)="setView('chat')"></app-user-profile>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- SHARED MODALS -->
+<!-- IMAGE POPUP (ELITE AMAZON ZOOM) -->
+<div class="modal-overlay-elite" *ngIf="activePopupImage" (click)="closeImagePopup()">
+  <div class="viewer-card-elite" (click)="$event.stopPropagation()">
+    <button class="btn-close-viewer" (click)="closeImagePopup()"><i class="bi bi-x-lg"></i></button>
+    <div class="zoom-container">
+      <div class="zoom-lens" #zoomLens (mousemove)="onZoomMove($event)"></div>
+      <img [src]="activePopupImage" #zoomImage 
+           (mouseenter)="toggleZoom(true)" 
+           (mouseleave)="toggleZoom(false)"
+           (mousemove)="onZoomMove($event)" alt="Intel Preview">
+    </div>
+    <!-- ZOOM RESULT BOX (OUTSIDE TO PREVENT CLIPPING) -->
+    <div class="zoom-result" #zoomResult></div>
+    <div class="viewer-footer">
+      <span>Operational Intelligence Asset Preview</span>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay-elite" *ngIf="showFollowListModal" (click)="closeFollowList()">
+  <div class="follow-list-card glass-panel fade-in" (click)="$event.stopPropagation()">
+    <div class="follow-header">
+      <h3>{{ followListTitle }}</h3>
+      <button class="btn-close-clean" (click)="closeFollowList()"><i class="bi bi-x-lg"></i></button>
+    </div>
+    
+    <div class="follow-content-scroll custom-scroll">
+      <div class="follow-item-clean" *ngFor="let user of followList">
+        <div class="f-user-info" (click)="viewPublicProfile(user.userId); closeFollowList()">
+          <img [src]="getAvatar(user) || 'https://ui-avatars.com/api/?name='+(user.fullName || 'U')+'&background=f1f5f9&color=6366f1'" alt="Personnel">
+          <div class="f-meta">
+            <span class="f-name">{{ user.fullName }}</span>
+            <span class="f-role">Personnel</span>
+          </div>
+        </div>
+        <button class="btn-follow-mini" (click)="toggleFollowInList(user)" *ngIf="user.userId !== currentLoggedInUserId">
+          {{ user.isFollowing ? 'Following' : 'Follow' }}
+        </button>
+      </div>
+
+      <div *ngIf="followList.length === 0" class="empty-list-state">
+        <i class="bi bi-people"></i>
+        <p>No connections found in this briefing.</p>
+      </div>
+    </div>
+  </div>
+</div>

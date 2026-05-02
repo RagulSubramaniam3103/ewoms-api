@@ -1,0 +1,244 @@
+/* === ELITE IDENTITY CONFIGURATION DESIGN === */
+
+.edit-profile-canvas {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+/* HEADER */
+.config-header {
+  padding: 2rem 3rem;
+  background: white;
+  border-radius: 32px;
+  margin-bottom: 2rem;
+  border: 1px solid var(--border-light);
+  box-shadow: 0 10px 30px rgba(30, 27, 75, 0.02);
+}
+
+.config-header-content { display: flex; align-items: center; gap: 1.5rem; }
+
+.config-icon {
+  width: 50px;
+  height: 50px;
+  background: var(--indigo-deep);
+  color: white;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.config-icon svg { width: 26px; height: 26px; fill: currentColor; }
+
+.config-title h2 { font-size: 1.75rem; font-weight: 900; color: var(--indigo-deep); margin: 0; }
+.config-title p { font-size: 0.9rem; color: var(--text-secondary); margin: 0.25rem 0 0; }
+
+/* LAYOUT */
+.config-layout {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 3rem;
+}
+
+/* IDENTITY PANEL */
+.identity-config-panel { display: flex; flex-direction: column; gap: 2rem; }
+
+.avatar-config-zone {
+  background: white;
+  padding: 2.5rem;
+  border-radius: 32px;
+  border: 1px solid var(--border-light);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
+.avatar-rings-container {
+  position: relative;
+  width: 180px;
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar-display {
+  width: 150px;
+  height: 150px;
+  border-radius: 50px;
+  overflow: hidden;
+  position: relative;
+  border: 4px solid white;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+  z-index: 5;
+}
+
+.avatar-display img { width: 100%; height: 100%; object-fit: cover; }
+
+.avatar-edit-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(30, 27, 75, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s;
+  cursor: pointer;
+  color: white;
+}
+.avatar-display:hover .avatar-edit-overlay { opacity: 1; }
+.avatar-edit-overlay svg { width: 32px; height: 32px; fill: currentColor; }
+
+.rings-fx .r-one, .rings-fx .r-two {
+  position: absolute;
+  inset: -10px;
+  border-radius: 60px;
+  border: 1px solid var(--indigo-light);
+  opacity: 0.15;
+}
+.r-one { animation: rotate 20s linear infinite; }
+.r-two { inset: 5px; border-style: dashed; animation: rotate 15s linear reverse infinite; }
+
+@keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+.avatar-metadata { text-align: center; }
+
+/* PRIVACY CARD */
+.privacy-config-card {
+  padding: 2rem;
+  background: white;
+  border-radius: 28px;
+  border: 1px solid var(--border-light);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.premium-toggle {
+  position: relative;
+  width: 54px;
+  height: 30px;
+  flex-shrink: 0;
+}
+
+.premium-toggle input { opacity: 0; width: 0; height: 0; }
+
+.toggle-track {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background: #f1f5f9;
+  transition: .4s;
+  border-radius: 30px;
+}
+
+.toggle-track:before {
+  position: absolute;
+  content: "";
+  height: 22px;
+  width: 22px;
+  left: 4px;
+  bottom: 4px;
+  background: white;
+  transition: .4s;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+input:checked + .toggle-track { background: var(--indigo-primary); }
+input:checked + .toggle-track:before { transform: translateX(24px); }
+
+/* DATA FIELDS */
+.data-config-panel {
+  background: white;
+  padding: 3rem;
+  border-radius: 40px;
+  border: 1px solid var(--border-light);
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+}
+
+.config-section { display: flex; flex-direction: column; gap: 1.5rem; }
+.section-title { padding-bottom: 0.75rem; border-bottom: 1px solid var(--border-light); margin-bottom: 0.5rem; color: var(--indigo-primary); }
+
+.config-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+.config-group { display: flex; flex-direction: column; gap: 0.6rem; }
+
+.label-small { font-size: 0.75rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+.hint-small { font-size: 0.7rem; font-weight: 600; color: var(--text-muted); line-height: 1.4; display: block; }
+
+.input-nexus {
+  position: relative;
+  background: #f8fafc;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid var(--border-light);
+  transition: all 0.3s;
+}
+
+.input-nexus input {
+  width: 100%;
+  padding: 1rem 1.25rem;
+  background: transparent;
+  border: none;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--indigo-deep);
+  outline: none;
+}
+
+.nexus-line {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: var(--indigo-primary);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.input-nexus:focus-within { background: white; border-color: var(--indigo-light); box-shadow: 0 10px 20px rgba(99, 102, 241, 0.05); }
+.input-nexus:focus-within .nexus-line { left: 0; width: 100%; }
+
+.readonly-nexus { opacity: 0.6; background: #f1f5f9; cursor: not-allowed; }
+
+/* ACTIONS */
+.config-actions {
+  margin-top: 2rem;
+  padding-top: 3rem;
+  border-top: 1px solid var(--border-light);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.btn-nexus-save {
+  background: var(--indigo-deep);
+  color: white;
+  border: none;
+  padding: 1.25rem 3.5rem;
+  border-radius: 20px;
+  font-weight: 900;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 15px 35px rgba(30, 27, 75, 0.2);
+}
+
+.btn-nexus-save:hover:not(:disabled) { background: var(--indigo-primary); transform: translateY(-3px); box-shadow: 0 20px 40px rgba(67, 56, 202, 0.3); }
+
+.elite-alert { padding: 1rem 1.5rem; border-radius: 16px; font-size: 0.85rem; font-weight: 700; }
+.success-alert { background: #f0fdf4; color: #10b981; border: 1px solid #dcfce7; }
+.error-alert { background: #fef2f2; color: #ef4444; border: 1px solid #fee2e2; }
+
+.mt-1 { margin-top: 1rem; }
+
+@media (max-width: 1000px) {
+  .config-layout { grid-template-columns: 1fr; }
+  .config-grid { grid-template-columns: 1fr; }
+}

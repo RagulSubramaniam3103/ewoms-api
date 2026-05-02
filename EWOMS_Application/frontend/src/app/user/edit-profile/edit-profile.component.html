@@ -1,0 +1,129 @@
+<div class="edit-profile-canvas fade-in">
+  <!-- CONFIG HEADER -->
+  <header class="config-header">
+    <div class="config-header-content">
+      <div class="config-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+      </div>
+      <div class="config-title">
+        <h2>Identity Configuration</h2>
+        <p>Modify your personnel data and system operational parameters.</p>
+      </div>
+    </div>
+  </header>
+
+  <form (ngSubmit)="onSubmit()" #profileForm="ngForm" class="config-body">
+    <div class="config-layout">
+      
+      <!-- LEFT: AVATAR & PRIMARY -->
+      <aside class="identity-config-panel">
+        <div class="avatar-config-zone">
+          <div class="avatar-rings-container">
+            <div class="rings-fx">
+              <div class="r-one"></div>
+              <div class="r-two"></div>
+            </div>
+            <div class="avatar-display">
+              <img [src]="imagePreview || 'https://ui-avatars.com/api/?name=User&background=1e1b4b&color=fff'" alt="Avatar Preview">
+              <label for="imgUpload" class="avatar-edit-overlay">
+                <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+              </label>
+              <input type="file" id="imgUpload" (change)="onFileSelected($event)" hidden accept="image/*">
+            </div>
+          </div>
+          <div class="avatar-metadata">
+            <span class="label-small">Identity Portrait</span>
+            <span class="hint-small">PNG, WEBP, or JPG. Max resolution 2048px.</span>
+          </div>
+        </div>
+
+        <div class="privacy-config-card glass-panel">
+          <div class="privacy-info">
+            <span class="label-small">Neural Privacy</span>
+            <p class="hint-small">Enabling private mode restricts your operational feed to authorized connections only.</p>
+          </div>
+          <label class="premium-toggle">
+            <input type="checkbox" [(ngModel)]="profileData.IsPrivate" name="IsPrivate">
+            <span class="toggle-track"></span>
+          </label>
+        </div>
+      </aside>
+
+      <!-- RIGHT: DATA FIELDS -->
+      <main class="data-config-panel">
+        <div class="config-section">
+          <span class="section-title label-small">Authentication Details</span>
+          <div class="config-grid">
+            <div class="config-group">
+              <label class="label-small">Full Personnel Name</label>
+              <div class="input-nexus">
+                <input type="text" [(ngModel)]="profileData.FullName" name="FullName" required placeholder="Full Name">
+                <div class="nexus-line"></div>
+              </div>
+            </div>
+            <div class="config-group">
+              <label class="label-small">System Alias (Username)</label>
+              <div class="input-nexus">
+                <input type="text" [(ngModel)]="profileData.UserName" name="UserName" required placeholder="Username">
+                <div class="nexus-line"></div>
+              </div>
+            </div>
+          </div>
+          <div class="config-group mt-1">
+            <label class="label-small">Registered Work Email</label>
+            <div class="input-nexus readonly-nexus">
+              <input type="email" [(ngModel)]="profileData.Email" name="Email" readonly placeholder="Email Address">
+              <div class="nexus-line"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="config-section">
+          <span class="section-title label-small">Location & Connectivity</span>
+          <div class="config-group">
+            <label class="label-small">Contact Number</label>
+            <div class="input-nexus">
+              <input type="text" [(ngModel)]="profileData.PhoneNumber" name="PhoneNumber" placeholder="+1 (000) 000-0000">
+              <div class="nexus-line"></div>
+            </div>
+          </div>
+          <div class="config-group mt-1">
+            <label class="label-small">Primary Operational Base (Address)</label>
+            <div class="input-nexus">
+              <input type="text" [(ngModel)]="profileData.Address1" name="Address1" placeholder="Address Line 1">
+              <div class="nexus-line"></div>
+            </div>
+          </div>
+          <div class="config-grid mt-1">
+            <div class="config-group">
+              <label class="label-small">City / Sector</label>
+              <div class="input-nexus">
+                <input type="text" [(ngModel)]="profileData.City" name="City" placeholder="City">
+                <div class="nexus-line"></div>
+              </div>
+            </div>
+            <div class="config-group">
+              <label class="label-small">Zone / State</label>
+              <div class="input-nexus">
+                <input type="text" [(ngModel)]="profileData.State" name="State" placeholder="State">
+                <div class="nexus-line"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <footer class="config-actions">
+          <div class="status-zone">
+            <div *ngIf="successMsg" class="elite-alert success-alert">{{ successMsg }}</div>
+            <div *ngIf="errorMsg" class="elite-alert error-alert">{{ errorMsg }}</div>
+          </div>
+          <button type="submit" class="btn-nexus-save" [disabled]="isLoading">
+            <span *ngIf="!isLoading">Synchronize Profile</span>
+            <div class="loader-nexus-sm" *ngIf="isLoading"></div>
+          </button>
+        </footer>
+      </main>
+
+    </div>
+  </form>
+</div>

@@ -1,0 +1,74 @@
+<div class="view-panel fade-in">
+  <!-- ELITE SECURITY HEADER -->
+  <header class="security-header">
+    <div class="sec-title-group">
+      <h3>Lockout Management</h3>
+      <p>Monitor and resolve system access restrictions for personnel.</p>
+    </div>
+    <div class="sec-status-card glass-panel">
+      <div class="status-node">
+        <span class="label-small">System Status</span>
+        <span class="val-secure">Secure</span>
+      </div>
+      <div class="status-node">
+        <span class="label-small">Active Lockouts</span>
+        <span class="val-count">{{ lockoutUsers.length }}</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="security-body">
+    <!-- SEARCH & TOOLS -->
+    <div class="sec-toolbar">
+      <div class="search-nexus">
+        <i class="bi bi-shield-lock"></i>
+        <input type="text" placeholder="Search locked accounts..." [(ngModel)]="searchTerm" (input)="onSearchChange()">
+      </div>
+    </div>
+
+    <!-- LOCKOUT GRID -->
+    <div class="lockout-grid">
+      <div *ngIf="isLoading" class="loader-box">
+        <div class="spinner-nexus"></div>
+        <p>Syncing Security Data...</p>
+      </div>
+
+      <div *ngIf="!isLoading && lockoutUsers.length === 0" class="empty-state-clean">
+        <i class="bi bi-shield-check"></i>
+        <h4>No Active Lockouts</h4>
+        <p>All system access points are currently operational.</p>
+      </div>
+
+      <div class="lock-card glass-panel fade-in" *ngFor="let user of filteredLockoutUsers">
+        <div class="lock-header">
+          <div class="user-info">
+            <img [src]="'data:image/webp;base64,' + user.profileImage" *ngIf="user.profileImage">
+            <img src="https://ui-avatars.com/api/?name={{user.userName}}&background=f1f5f9&color=6366f1" *ngIf="!user.profileImage">
+            <div class="u-meta">
+              <span class="u-name">{{ user.userName }}</span>
+              <span class="u-role">Personnel Identity</span>
+            </div>
+          </div>
+          <div class="lock-icon-badge"><i class="bi bi-lock-fill"></i></div>
+        </div>
+
+        <div class="lock-details">
+          <div class="d-row">
+            <span class="d-label">Email</span>
+            <span class="d-val">{{ user.email }}</span>
+          </div>
+          <div class="d-row">
+            <span class="d-label">Locked Since</span>
+            <span class="d-val">{{ user.lockoutEnd | date:'medium' }}</span>
+          </div>
+        </div>
+
+        <div class="lock-actions">
+          <button class="btn-unlock-elite" (click)="unlockUser(user.id)">
+            <i class="bi bi-unlock"></i> Restore Access
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

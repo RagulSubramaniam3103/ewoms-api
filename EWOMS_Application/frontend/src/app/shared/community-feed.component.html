@@ -1,0 +1,335 @@
+<div class="community-feed-portal fade-in">
+  <!-- ELITE FEED TABS -->
+  <nav class="feed-tab-nav">
+    <div class="tab-nav-inner">
+      <button [class.active]="viewMode === 'list'" (click)="viewMode = 'list'">
+        <i class="bi" [class.bi-grid-fill]="viewMode === 'list'" [class.bi-grid]="viewMode !== 'list'"></i>
+        <span>Feed</span>
+      </button>
+      <button [class.active]="viewMode === 'grid'" (click)="viewMode = 'grid'">
+        <i class="bi" [class.bi-compass-fill]="viewMode === 'grid'" [class.bi-compass]="viewMode !== 'grid'"></i>
+        <span>Explore</span>
+      </button>
+      <button *ngIf="role === 'admin'" [class.active]="viewMode === 'table'" (click)="viewMode = 'table'">
+        <i class="bi" [class.bi-shield-check]="viewMode === 'table'" [class.bi-shield]="viewMode !== 'table'"></i>
+        <span>Governance</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ELITE FEED LOADER -->
+  <div class="elite-feed-loader" *ngIf="isLoading">
+    <div class="loader-content">
+      <div class="pulse-ring"></div>
+      <div class="spinner-nexus"></div>
+      <p>Synchronizing Community Intel...</p>
+    </div>
+  </div>
+
+  <div class="feed-content-wrapper" *ngIf="!isLoading">
+    <!-- STORIES TRAY -->
+    <section class="stories-horizontal-hub" *ngIf="viewMode === 'list' || viewMode === 'grid' || viewMode === 'explore'">
+      <div class="story-item create-story" (click)="openStoryCreator()">
+        <div class="story-ring">
+          <div class="avatar-box">
+            <img [src]="getCurrentUserAvatar()" alt="You">
+          </div>
+          <div class="plus-badge"><i class="bi bi-plus-lg"></i></div>
+        </div>
+        <span class="story-name">Your Story</span>
+      </div>
+
+      <div class="story-item" *ngFor="let s of filteredStories" (click)="openStory(s)">
+        <div class="story-ring" [class.unseen]="s.hasUnseen">
+          <div class="avatar-box">
+            <img [src]="s.userImage ? (s.userImage.startsWith('data:image') || s.userImage.startsWith('http') ? s.userImage : 'data:image/jpeg;base64,' + s.userImage) : 'https://ui-avatars.com/api/?name=' + s.userName" alt="User">
+          </div>
+        </div>
+        <span class="story-name">{{ s.userName.split(' ')[0] }}</span>
+      </div>
+    </section>
+
+    <!-- FEED STREAM -->
+    <div class="feed-canvas" *ngIf="viewMode === 'list' || viewMode === 'explore'">
+      <div class="insta-post-card fade-in" *ngFor="let post of filteredPosts">
+        <!-- POST HEADER -->
+        <div class="post-card-header">
+          <div class="author-block" (click)="onViewProfile(post.userId)">
+            <div class="author-avatar">
+              <img [src]="getAuthorAvatar(post)" alt="Avatar">
+            </div>
+            <div class="author-meta">
+              <span class="author-name">{{ post.userName }}</span>
+              <span class="post-location">Global Operations Hub</span>
+            </div>
+          </div>
+          <button class="post-more-btn"><i class="bi bi-three-dots"></i></button>
+        </div>
+
+        <!-- POST MEDIA -->
+        <div class="post-media-stage" (dblclick)="likePost(post)">
+          <img [src]="'data:image/jpeg;base64,' + post.displayImage" [class.blur-content]="post.isBlurred && !post.isRevealed">
+          
+          <!-- PRIVACY OVERLAY -->
+          <div class="privacy-mask-elite" *ngIf="post.isBlurred && !post.isRevealed" (click)="revealPost(post)">
+            <div class="mask-center">
+              <i class="bi bi-eye-slash-fill"></i>
+              <h4>Intel Restricted</h4>
+              <button class="btn-reveal-elite">Access Protocol</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- POST ACTIONS -->
+        <div class="post-engagement-core">
+          <div class="action-buttons-row">
+            <div class="left-actions">
+              <button class="action-btn" [class.liked]="post.isLiked" (click)="likePost(post)">
+                <i class="bi" [class.bi-heart]="!post.isLiked" [class.bi-heart-fill]="post.isLiked"></i>
+              </button>
+              <button class="action-btn" (click)="toggleComments(post)">
+                <i class="bi bi-chat"></i>
+              </button>
+              <button class="action-btn">
+                <i class="bi bi-send"></i>
+              </button>
+            </div>
+            <button class="action-btn bookmark" [class.saved]="post.isSaved" (click)="toggleSavePost(post)">
+              <i class="bi" [class.bi-bookmark]="!post.isSaved" [class.bi-bookmark-fill]="post.isSaved"></i>
+            </button>
+          </div>
+
+          <div class="engagement-info">
+            <p class="likes-count" *ngIf="post.likeCount > 0">{{ post.likeCount | number }} likes</p>
+            <div class="post-caption">
+              <span class="caption-user" (click)="onViewProfile(post.userId)">{{ post.userName }}</span>
+              <span class="caption-text">{{ post.caption }}</span>
+            </div>
+            <button class="view-comments-btn" *ngIf="post.commentCount > 0" (click)="toggleComments(post)">
+              View all {{ post.commentCount }} comments
+            </button>
+            <span class="post-timestamp">{{ post.createdAt | date:'MMMM d' | uppercase }}</span>
+          </div>
+
+          <!-- INLINE COMMENTS HUB (INTEGRATED SAME AREA) -->
+          <div class="inline-comments-hub" *ngIf="post.showInlineComments">
+            <div class="inline-loader" *ngIf="post.isLoadingComments">
+              <div class="spinner-mini"></div>
+            </div>
+            
+            <div class="inline-stream-list" *ngIf="!post.isLoadingComments">
+              <div class="inline-comment-item" *ngFor="let comment of post.comments">
+                <img [src]="getAuthorAvatar(comment)" class="c-avatar">
+                <div class="c-body">
+                  <p><strong>{{ comment.userName }}</strong> {{ comment.content }}</p>
+                  <span class="c-date">{{ comment.createdAt | date:'shortTime' }}</span>
+                </div>
+              </div>
+              <div *ngIf="post.comments?.length === 0" class="no-comments-msg">
+                No intelligence briefings yet.
+              </div>
+            </div>
+
+            <div class="inline-input-nexus">
+              <img [src]="getCurrentUserAvatar()" class="c-avatar">
+              <input type="text" [(ngModel)]="post.newCommentText" 
+                    placeholder="Write a briefing..." 
+                    (keyup.enter)="submitInlineComment(post)">
+              <button (click)="submitInlineComment(post)" [disabled]="!post.newCommentText?.trim() || post.isSubmitting">
+                {{ post.isSubmitting ? '...' : 'Post' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NEURAL SILENCE STATE -->
+      <div class="empty-feed-state fade-in" *ngIf="filteredPosts.length === 0">
+        <div class="empty-intel-card glass-panel">
+          <i class="bi bi-shield-lock"></i>
+          <h3>No Intelligence Surfaced</h3>
+          <p>Your current network and public discovery settings have prioritized privacy. Try following more personnel or adjusting your filters in the Explore tab.</p>
+          <button class="btn-discover-more" (click)="viewMode = 'grid'">Discovery Nexus</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- DISCOVERY GRID (NEXUS) -->
+    <div class="discovery-grid-elite" *ngIf="viewMode === 'grid'">
+      <div class="grid-layout">
+        <div class="grid-item" *ngFor="let post of paginatedDiscoverPosts" (click)="toggleComments(post)">
+          <img [src]="'data:image/jpeg;base64,' + post.displayImage" [class.blur-content]="post.isBlurred && !post.isRevealed">
+          <div class="grid-overlay">
+            <div class="overlay-stats">
+              <span><i class="bi bi-heart-fill"></i> {{ post.likeCount }}</span>
+              <span><i class="bi bi-chat-fill"></i> {{ post.commentCount }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GOVERNANCE TABLE -->
+    <div class="governance-table-canvas" *ngIf="viewMode === 'table'">
+      <div class="table-wrapper glass-panel">
+        <table class="elite-table">
+          <thead>
+            <tr>
+              <th>Personnel</th>
+              <th>Intel Snippet</th>
+              <th>Metrics</th>
+              <th>Status</th>
+              <th class="text-right">Control</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let post of paginatedManagePosts" class="elite-row">
+              <td>
+                <div class="user-cell">
+                  <img [src]="getAuthorAvatar(post)" alt="User">
+                  <div class="user-info">
+                    <span class="u-name">{{ post.userName }}</span>
+                    <small class="u-date">{{ post.createdAt | date:'short' }}</small>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="content-cell">
+                  <p>{{ post.caption | slice:0:40 }}...</p>
+                </div>
+              </td>
+              <td>
+                <div class="metrics-cell">
+                  <span class="m-stat"><i class="bi bi-heart-fill"></i> {{ post.likeCount }}</span>
+                  <span class="m-stat"><i class="bi bi-chat-fill"></i> {{ post.commentCount }}</span>
+                </div>
+              </td>
+              <td>
+                <span class="status-badge" [class.live]="!post.isBlurred" [class.filtered]="post.isBlurred">
+                  {{ post.isBlurred ? 'FILTERED' : 'LIVE' }}
+                </span>
+              </td>
+              <td>
+                <div class="control-tray">
+                  <button class="ctrl-btn" (click)="toggleBlur(post)"><i class="bi" [class.bi-eye]="post.isBlurred" [class.bi-eye-slash]="!post.isBlurred"></i></button>
+                  <button class="ctrl-btn danger" (click)="archivePost(post)"><i class="bi bi-archive"></i></button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SOCIAL INTELLIGENCE SIDEBAR (RIGHT DRAWER) -->
+<div class="comments-sidebar-overlay" *ngIf="showComments" (click)="closeComments()">
+  <div class="comments-sidebar-card" (click)="$event.stopPropagation()">
+    <div class="sidebar-intel-header">
+      <div class="intel-author" *ngIf="getPostById(activeCommentPostId) as p">
+        <img [src]="getAuthorAvatar(p)">
+        <div class="author-meta">
+          <span class="a-name">{{ p.userName }}</span>
+          <small class="a-status">Intelligence Stream</small>
+        </div>
+      </div>
+      <button class="close-sidebar-btn-elite" (click)="closeComments()">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+    
+    <div class="sidebar-intel-stream">
+      <div class="stream-comment owner-caption" *ngIf="getPostById(activeCommentPostId) as p">
+        <img [src]="getAuthorAvatar(p)">
+        <div class="comment-content">
+          <p><strong>{{ p.userName }}</strong> {{ p.caption }}</p>
+          <span class="comment-meta">{{ p.createdAt | date:'shortTime' }}</span>
+        </div>
+      </div>
+      
+      <div class="stream-divider">Social Engagement</div>
+
+      <div class="stream-comment" *ngFor="let comment of currentPostComments">
+        <img [src]="getAuthorAvatar(comment)">
+        <div class="comment-data">
+          <p><strong>{{ comment.userName }}</strong> {{ comment.content }}</p>
+          <span class="comment-meta">{{ comment.createdAt | date:'shortTime' }}</span>
+        </div>
+      </div>
+
+      <div *ngIf="currentPostComments.length === 0" class="empty-stream">
+        <i class="bi bi-chat-dots"></i>
+        <p>No active intelligence nodes yet.</p>
+      </div>
+    </div>
+
+    <div class="sidebar-intel-footer">
+      <div class="quick-actions">
+         <div class="action-set">
+           <i class="bi bi-heart"></i>
+           <i class="bi bi-chat"></i>
+           <i class="bi bi-send"></i>
+         </div>
+         <i class="bi bi-bookmark"></i>
+      </div>
+      
+      <div class="likes-summary" *ngIf="getPostById(activeCommentPostId) as p">
+        <strong>{{ p.likeCount | number }} likes</strong>
+      </div>
+
+      <div class="comment-input-nexus">
+        <input type="text" [(ngModel)]="newCommentText" placeholder="Add a briefing note..." (keyup.enter)="submitComment()">
+        <button class="btn-post-comment" [disabled]="!newCommentText.trim() || isSubmittingComment" (click)="submitComment()">
+          {{ isSubmittingComment ? '...' : 'Post' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STORY VIEWER OVERLAY -->
+<div class="story-viewer-overlay" *ngIf="activeStory" (click)="closeStory()">
+  <div class="story-viewer-card" (click)="$event.stopPropagation()">
+    <div class="story-viewer-header">
+      <div class="v-user">
+        <img [src]="getAuthorAvatar(activeStory)" alt="User">
+        <span>{{ activeStory.userName }}</span>
+      </div>
+      <button class="v-close" (click)="closeStory()"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div class="story-viewer-content">
+      <div class="story-nav-btn prev" (click)="prevSegment($event)"><i class="bi bi-chevron-left"></i></div>
+      <img [src]="'data:image/jpeg;base64,' + activeStory.segments[activeStory.currentSegmentIndex].displayImage" alt="Story">
+      <div class="story-nav-btn next" (click)="nextSegment($event)"><i class="bi bi-chevron-right"></i></div>
+    </div>
+  </div>
+</div>
+
+<!-- STORY CREATOR MODAL -->
+<div class="story-creator-overlay" *ngIf="showStoryCreator" (click)="closeStoryCreator()">
+  <div class="story-creator-card" (click)="$event.stopPropagation()">
+    <div class="creator-header">
+      <h4>Create Intelligence Story</h4>
+      <button class="close-btn" (click)="closeStoryCreator()"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div class="creator-body">
+      <div class="story-dropzone" (click)="storyFileInput.click()">
+        <input type="file" #storyFileInput hidden (change)="onStoryFileSelected($event)" accept="image/*">
+        <img [src]="storyImagePreview" *ngIf="storyImagePreview" class="preview-img">
+        <div class="drop-prompt" *ngIf="!storyImagePreview">
+          <i class="bi bi-cloud-arrow-up"></i>
+          <span>Select Intelligence Asset</span>
+        </div>
+      </div>
+      <div class="creator-input-group">
+        <textarea [(ngModel)]="storyCaption" placeholder="Operational briefing (optional)..."></textarea>
+      </div>
+    </div>
+    <div class="creator-footer">
+      <button class="btn-share-story" (click)="shareStory()" [disabled]="!selectedStoryFile || isSharingStory">
+        {{ isSharingStory ? 'Sharing...' : 'Broadcast Story' }}
+      </button>
+    </div>
+  </div>
+</div>

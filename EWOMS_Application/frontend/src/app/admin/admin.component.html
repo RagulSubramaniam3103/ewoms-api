@@ -1,0 +1,411 @@
+<div class="main-shell">
+  <!-- ELITE MINIMALIST SIDEBAR -->
+  <aside class="side-nav-clean">
+    <div class="nav-brand">
+      <div class="brand-logo">
+        <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <span class="brand-name">MOMENTUM</span>
+    </div>
+
+    <nav class="nav-links-clean">
+      <div class="nav-section-label">Overview</div>
+      <a href="#" [class.active]="currentView === 'dashboard'" (click)="setView('dashboard'); $event.preventDefault()">
+        <i class="bi bi-cpu"></i> Dashboard
+      </a>
+      <a href="#" [class.active]="currentView === 'community-feed'" (click)="setView('community-feed'); $event.preventDefault()">
+        <i class="bi bi-compass"></i> Feed
+      </a>
+      
+      <div class="nav-section-label">Network</div>
+      <a href="#" [class.active]="currentView === 'user-management'" (click)="setView('user-management'); $event.preventDefault()">
+        <i class="bi bi-people"></i> Directory
+      </a>
+      <a href="#" [class.active]="currentView === 'chat'" (click)="setView('chat'); $event.preventDefault()">
+        <i class="bi bi-chat-dots"></i> Chat
+      </a>
+
+      <div class="nav-section-label">Oversight</div>
+      <a href="#" [class.active]="currentView === 'register-user'" (click)="setView('register-user'); $event.preventDefault()">
+        <i class="bi bi-person-plus"></i> Add User
+      </a>
+      <a href="#" [class.active]="currentView === 'lockout-management'" (click)="setView('lockout-management'); $event.preventDefault()">
+        <i class="bi bi-shield-lock"></i> Security
+      </a>
+      <a href="#" [class.active]="currentView === 'post-moderation'" (click)="setView('post-moderation'); $event.preventDefault()">
+        <i class="bi bi-shield-check"></i> Moderation
+      </a>
+
+      <div class="nav-section-label">Account</div>
+      <a href="#" [class.active]="currentView === 'profile'" (click)="setView('profile'); $event.preventDefault()">
+        <i class="bi bi-person-circle"></i> Profile
+      </a>
+      <a href="#" [class.active]="currentView === 'edit-profile'" (click)="setView('edit-profile'); $event.preventDefault()">
+        <i class="bi bi-pencil-square"></i> Settings
+      </a>
+      <a href="#" [class.active]="currentView === 'create-post'" (click)="setView('create-post'); $event.preventDefault()">
+        <i class="bi bi-plus-square"></i> New Post
+      </a>
+    </nav>
+
+    <div class="nav-footer">
+      <button class="btn-logout-clean" (click)="logout()">
+        <i class="bi bi-box-arrow-left"></i> Logout
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN VIEWPORT -->
+  <main class="viewport-clean">
+    <!-- APP HEADER -->
+    <header class="app-header-clean">
+      <div class="header-search">
+        <i class="bi bi-search"></i>
+        <input type="text" placeholder="Search systems or personnel...">
+      </div>
+
+      <div class="header-controls">
+        <div class="ctrl-icon" (click)="toggleNotifications($event)" [class.has-notifs]="notificationCount > 0">
+          <i class="bi bi-bell" [class.blink-bell]="notificationCount > 0"></i>
+          <span class="badge-dot" *ngIf="notificationCount > 0"></span>
+          
+          <!-- NOTIFICATIONS DROPDOWN -->
+          <div class="notifications-dropdown" *ngIf="notificationsOpen" (click)="$event.stopPropagation()">
+            <div class="notif-header">
+              <span class="notif-title" [class.blink-text]="notificationCount > 0">
+                <i class="bi bi-journal-text"></i> Operational Briefings
+              </span>
+              <button class="btn-text-tiny" (click)="markAllNotificationsRead()">Clear All</button>
+            </div>
+            <div class="notif-scroll">
+              <div class="notif-item" *ngFor="let n of notifications" [class.unread]="!n.isRead">
+                <div class="n-icon"><i class="bi bi-info-circle"></i></div>
+                <div class="n-content">
+                  <p class="n-text">{{ n.message }}</p>
+                  <span class="n-time">{{ n.createdAt | date:'short' }}</span>
+                </div>
+              </div>
+              <div class="notif-empty" *ngIf="notifications.length === 0">
+                <i class="bi bi-check-all"></i>
+                <p>All clear. No new briefings.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="ctrl-icon"><i class="bi bi-chat-dots"></i></div>
+        
+        <div class="profile-pill-clean" (click)="setView('profile')">
+          <img [src]="profileImage || 'https://ui-avatars.com/api/?name='+(userName || 'A')+'&background=f1f5f9&color=6366f1'" alt="Avatar" class="pill-avatar">
+          <span class="pill-name">{{ userName || 'Admin' }}</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- DYNAMIC VIEW CONTENT -->
+    <div class="view-content-clean fade-in" 
+         [class.no-padding]="currentView === 'community-feed' || currentView === 'create-post' || currentView === 'chat'"
+         [ngSwitch]="currentView">
+      <div *ngSwitchCase="'dashboard'" class="dashboard-elite fade-in">
+        <!-- BRIEFING HEADER -->
+        <header class="dash-briefing">
+          <div class="briefing-info">
+            <h1>Intelligence Command Console</h1>
+            <p>Welcome back, Commander <strong>{{ userName }}</strong>. Here is the latest operational briefing.</p>
+          </div>
+          <div class="briefing-date">
+            <i class="bi bi-calendar3"></i>
+            <span>{{ today | date:'EEEE, MMMM d' }}</span>
+          </div>
+        </header>
+
+        <!-- CORE METRICS GRID -->
+        <div class="metrics-grid">
+          <div class="metric-card gold">
+            <div class="m-icon"><i class="bi bi-people"></i></div>
+            <div class="m-data">
+              <span class="m-label">Total Personnel</span>
+              <h3 class="m-value">{{ dashboardStats.totalMembers }}</h3>
+              <span class="m-trend positive"><i class="bi bi-arrow-up"></i> 12% increase</span>
+            </div>
+          </div>
+          <div class="metric-card indigo">
+            <div class="m-icon"><i class="bi bi-broadcast"></i></div>
+            <div class="m-data">
+              <span class="m-label">Intel Broadcasts</span>
+              <h3 class="m-value">{{ dashboardStats.totalPosts }}</h3>
+              <span class="m-trend positive"><i class="bi bi-arrow-up"></i> 8% growth</span>
+            </div>
+          </div>
+          <div class="metric-card rose">
+            <div class="m-icon"><i class="bi bi-shield-lock"></i></div>
+            <div class="m-data">
+              <span class="m-label">Security Protocol</span>
+              <h3 class="m-value">{{ dashboardStats.securityAlerts }}</h3>
+              <span class="m-trend neutral">System Stable</span>
+            </div>
+          </div>
+          <div class="metric-card emerald">
+            <div class="m-icon"><i class="bi bi-lightning-charge"></i></div>
+            <div class="m-data">
+              <span class="m-label">Active Sessions</span>
+              <h3 class="m-value">{{ dashboardStats.activeSessions || 42 }}</h3>
+              <span class="m-trend positive">Real-time Sync</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- OPERATIONAL MATRIX -->
+        <div class="operational-matrix">
+          <!-- RECENT ACTIVITY (FEED STYLE) -->
+          <div class="op-section activity-log glass-panel">
+            <div class="op-header">
+              <h4>Operational Activity</h4>
+              <button class="btn-view-all">Logs <i class="bi bi-arrow-right"></i></button>
+            </div>
+            <div class="activity-list-dash custom-scroll">
+              <div class="activity-entry">
+                <div class="entry-dot admin"></div>
+                <div class="entry-content">
+                  <p><strong>System Audit</strong> • Root administrative login detected from Secure Node-12.</p>
+                  <small>Just Now</small>
+                </div>
+              </div>
+              <div class="activity-entry">
+                <div class="entry-dot user"></div>
+                <div class="entry-content">
+                  <p><strong>New Deployment</strong> • 5 new personnel registered in the Southern Sector.</p>
+                  <small>14 mins ago</small>
+                </div>
+              </div>
+              <div class="activity-entry">
+                <div class="entry-dot warning"></div>
+                <div class="entry-content">
+                  <p><strong>Policy Trigger</strong> • Automatic moderation filter applied to broadcast ID #8821.</p>
+                  <small>1 hour ago</small>
+                </div>
+              </div>
+              <div class="activity-entry">
+                <div class="entry-dot success"></div>
+                <div class="entry-content">
+                  <p><strong>Sync Complete</strong> • Global identity registry synchronized with cloud core.</p>
+                  <small>3 hours ago</small>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SYSTEM HEALTH -->
+          <div class="op-section system-health glass-panel">
+            <div class="op-header">
+              <h4>Nexus Integrity</h4>
+            </div>
+            <div class="health-metrics">
+              <div class="h-item">
+                <div class="h-info">
+                  <span>API Performance</span>
+                  <span>99.8%</span>
+                </div>
+                <div class="h-progress"><div class="h-fill" style="width: 99.8%"></div></div>
+              </div>
+              <div class="h-item">
+                <div class="h-info">
+                  <span>Database Uplink</span>
+                  <span>12ms</span>
+                </div>
+                <div class="h-progress"><div class="h-fill warning" style="width: 75%"></div></div>
+              </div>
+              <div class="h-item">
+                <div class="h-info">
+                  <span>Storage Capacity</span>
+                  <span>42 / 500 TB</span>
+                </div>
+                <div class="h-progress"><div class="h-fill success" style="width: 25%"></div></div>
+              </div>
+            </div>
+
+            <!-- QUICK COMMANDS -->
+            <div class="quick-commands">
+              <button (click)="setView('register-user')"><i class="bi bi-plus-circle"></i> Deploy Personnel</button>
+              <button (click)="setView('post-moderation')"><i class="bi bi-shield-check"></i> Audit Broadcasts</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngSwitchCase="'user-management'">
+        <app-user-management></app-user-management>
+      </div>
+
+      <div *ngSwitchCase="'profile'">
+        <app-user-profile [userId]="currentLoggedInUserId" 
+                          [currentLoggedInUserId]="currentLoggedInUserId"
+                          [isOwn]="true"
+                          [role]="userRole"
+                          (openImage)="openImageFromPost($event)"
+                          (openFollowers)="openFollowers($event)"
+                          (openFollowing)="openFollowing($event)"
+                          (switchToEditProfile)="setView('edit-profile')"></app-user-profile>
+      </div>
+
+      <div *ngSwitchCase="'edit-profile'">
+        <app-edit-profile></app-edit-profile>
+      </div>
+
+      <div *ngSwitchCase="'register-user'">
+        <app-register-user></app-register-user>
+      </div>
+
+      <div *ngSwitchCase="'lockout-management'">
+        <app-lockout-management></app-lockout-management>
+      </div>
+
+      <div *ngSwitchCase="'post-moderation'">
+        <app-post-moderation (openImage)="openImageFromPost($event)"></app-post-moderation>
+      </div>
+
+      <div *ngSwitchCase="'community-feed'" class="feed-layout-container" style="flex: 1; display: flex; width: 100%; max-width: none; overflow-y: auto;">
+        <div class="feed-main-col">
+          <app-community-feed [userAvatar]="profileImage" (openImage)="openImageFromPost($event)" (viewProfile)="viewPublicProfile($event)"></app-community-feed>
+        </div>
+        
+        <aside class="feed-right-col glass-panel">
+          <div class="right-section">
+            <div class="section-header">
+              <span>Suggested for you</span>
+              <button class="btn-text">See All</button>
+            </div>
+            <div class="suggested-list">
+              <!-- DYNAMIC SUGGESTED USERS -->
+              <div class="suggested-item" *ngFor="let user of suggestedUsers">
+                <img [src]="getAvatar(user) || 'https://ui-avatars.com/api/?name='+user.fullName+'&background=f1f5f9&color=6366f1'" 
+                     alt="Personnel" (click)="viewPublicProfile(user.userId)">
+                <div class="s-info" (click)="viewPublicProfile(user.userId)">
+                  <span class="s-name">{{ user.fullName }}</span>
+                  <span class="s-meta">{{ user.role || 'Personnel' }}</span>
+                </div>
+                <button class="btn-follow-mini" (click)="toggleFollowInList(user)">
+                  {{ user.isFollowing ? 'Following' : 'Follow' }}
+                </button>
+              </div>
+
+              <div *ngIf="suggestedUsers.length === 0" class="no-suggestions">
+                <p>All personnel are currently connected.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- SIDEBAR OPERATIONAL BRIEFINGS -->
+          <div class="right-section">
+            <div class="section-header">
+              <span>Operational Briefings</span>
+              <button class="btn-text-tiny" (click)="markAllNotificationsRead()" *ngIf="notifications.length > 0">Clear</button>
+            </div>
+            <div class="sidebar-notif-list custom-scroll">
+              <div class="s-notif-item" *ngFor="let n of notifications.slice(0, 5)" [class.unread]="!n.isRead">
+                <div class="sn-icon"><i class="bi bi-info-circle"></i></div>
+                <div class="sn-content">
+                  <p class="sn-text">{{ n.message }}</p>
+                  <span class="sn-time">{{ n.createdAt | date:'shortTime' }}</span>
+                </div>
+              </div>
+              <div class="notif-empty-mini" *ngIf="notifications.length === 0">
+                <p>No new briefings.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="right-section">
+            <div class="section-header">
+              <span>Operational Analytics</span>
+            </div>
+            <div class="analytics-card-mini">
+              <div class="a-metric">
+                <span class="m-val">{{ dashboardStats.totalPosts }}</span>
+                <span class="m-lbl">Daily Broadcasts</span>
+              </div>
+              <div class="a-metric">
+                <span class="m-val">{{ dashboardStats.totalMembers }}</span>
+                <span class="m-lbl">Active Personnel</span>
+              </div>
+            </div>
+          </div>
+          
+          <footer class="right-footer-links">
+            <p>&copy; 2026 MOMENTUM SYSTEM</p>
+            <p>About &bull; Help &bull; Press &bull; Privacy &bull; Terms</p>
+          </footer>
+        </aside>
+      </div>
+
+      <div *ngSwitchCase="'create-post'">
+        <app-create-post (postCreated)="setView('community-feed')"></app-create-post>
+      </div>
+
+      <div *ngSwitchCase="'chat'" style="flex: 1; display: flex; flex-direction: column;">
+        <app-chat (unreadCountChanged)="loadUnreadCount()"></app-chat>
+      </div>
+
+      <!-- PUBLIC PROFILE VIEW -->
+      <div *ngSwitchCase="'view-profile'">
+        <app-user-profile [userId]="targetUserId" 
+                          [currentLoggedInUserId]="currentLoggedInUserId"
+                          [isOwn]="false"
+                          [role]="userRole"
+                          (viewProfile)="viewPublicProfile($event)"
+                          (openImage)="openImageFromPost($event)"
+                          (openFollowers)="openFollowers($event)"
+                          (openFollowing)="openFollowing($event)"
+                          (switchToChat)="setView('chat')"></app-user-profile>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- IMAGE POPUP (ELITE AMAZON ZOOM) -->
+<div class="modal-overlay-elite" *ngIf="activePopupImage" (click)="closeImagePopup()">
+  <div class="viewer-card-elite" (click)="$event.stopPropagation()">
+    <button class="btn-close-viewer" (click)="closeImagePopup()"><i class="bi bi-x-lg"></i></button>
+    <div class="zoom-container">
+      <div class="zoom-lens" #zoomLens (mousemove)="onZoomMove($event)"></div>
+      <img [src]="activePopupImage" #zoomImage 
+           (mouseenter)="toggleZoom(true)" 
+           (mouseleave)="toggleZoom(false)"
+           (mousemove)="onZoomMove($event)" alt="Intel Preview">
+    </div>
+    <!-- ZOOM RESULT BOX (OUTSIDE TO PREVENT CLIPPING) -->
+    <div class="zoom-result" #zoomResult></div>
+    <div class="viewer-footer">
+      <span>Operational Intelligence Asset Preview</span>
+    </div>
+  </div>
+</div>
+
+<!-- FOLLOW LIST MODAL -->
+<div class="modal-overlay-elite" *ngIf="showFollowListModal" (click)="closeFollowList()">
+  <div class="follow-list-card glass-panel fade-in" (click)="$event.stopPropagation()">
+    <div class="follow-header">
+      <h3>{{ followListTitle }}</h3>
+      <button class="btn-close-clean" (click)="closeFollowList()"><i class="bi bi-x-lg"></i></button>
+    </div>
+    
+    <div class="follow-content-scroll">
+      <div class="follow-item-clean" *ngFor="let user of followList">
+        <div class="f-user-info" (click)="viewPublicProfile(user.userId); closeFollowList()">
+          <img [src]="getAvatar(user) || 'https://ui-avatars.com/api/?name='+user.fullName+'&background=f1f5f9&color=6366f1'" alt="Personnel">
+          <div class="f-meta">
+            <span class="f-name">{{ user.fullName }}</span>
+            <span class="f-role">Personnel</span>
+          </div>
+        </div>
+        <button class="btn-follow-mini" (click)="toggleFollowInList(user)" *ngIf="user.userId !== currentLoggedInUserId">
+          {{ user.isFollowing ? 'Following' : 'Follow' }}
+        </button>
+      </div>
+
+      <div *ngIf="followList.length === 0" class="empty-list-state">
+        <i class="bi bi-people"></i>
+        <p>No connections found in this briefing.</p>
+      </div>
+    </div>
+  </div>
+</div>

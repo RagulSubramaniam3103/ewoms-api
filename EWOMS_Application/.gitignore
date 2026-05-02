@@ -1,0 +1,14 @@
+# Node
+node_modules/
+npm-debug.log
+chat-server/chat.db
+
+# Angular
+dist/
+.angular/
+.vscode/
+*.zip
+
+# OS
+.DS_Store
+Thumbs.db

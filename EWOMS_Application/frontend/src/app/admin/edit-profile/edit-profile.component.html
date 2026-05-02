@@ -1,0 +1,111 @@
+<div class="simple-profile-wrapper fade-in">
+  <div class="simple-header">
+    <h2>Edit Profile</h2>
+    <p>Update your personal and contact details.</p>
+  </div>
+
+  <form (ngSubmit)="onSubmit()" #profileForm="ngForm" class="simple-form">
+    <div class="profile-card-elite">
+      <div class="form-layout">
+        
+        <!-- IDENTITY SECTION -->
+        <div class="form-col">
+          <div class="section-label-elite">Personal Identity</div>
+          
+          <div class="avatar-group">
+            <div class="avatar-preview">
+              <img [src]="imagePreview || 'https://ui-avatars.com/api/?name=' + (profileData.FullName || 'User') + '&background=6366f1&color=fff'" alt="Avatar">
+              <label for="imgUpload" class="edit-btn">
+                <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+              </label>
+              <input type="file" id="imgUpload" (change)="onFileSelected($event)" hidden accept="image/*">
+            </div>
+            <div class="avatar-text">
+              <span>Profile Image</span>
+            </div>
+          </div>
+
+          <div class="s-input-group">
+            <label>Full Name</label>
+            <input type="text" [(ngModel)]="profileData.FullName" name="FullName" readonly class="readonly">
+          </div>
+
+          <div class="s-input-group">
+            <label>Username</label>
+            <input type="text" [(ngModel)]="profileData.UserName" name="UserName" readonly class="readonly">
+          </div>
+
+          <div class="s-input-group">
+            <label>Email Address</label>
+            <input type="email" [(ngModel)]="profileData.Email" name="Email" readonly class="readonly">
+          </div>
+
+          <div class="privacy-toggle-box">
+            <div class="toggle-info">
+              <span class="toggle-title">Account Privacy</span>
+              <span class="toggle-desc">Restrict intel access to connected personnel only.</span>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" [(ngModel)]="profileData.IsPrivate" name="IsPrivate">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- OPERATIONAL DATA SECTION -->
+        <div class="form-col">
+          <div class="section-label-elite">Operational Location</div>
+
+          <div class="s-input-group">
+            <label>Phone Number</label>
+            <input type="text" [(ngModel)]="profileData.PhoneNumber" name="PhoneNumber" placeholder="+1 (555) 000-0000">
+          </div>
+
+          <div class="s-input-group">
+            <label>Address Line 1</label>
+            <input type="text" [(ngModel)]="profileData.Address1" name="Address1" placeholder="Primary street address">
+          </div>
+
+          <div class="s-input-group">
+            <label>Address Line 2</label>
+            <input type="text" [(ngModel)]="profileData.Address2" name="Address2" placeholder="Suite, floor, etc.">
+          </div>
+
+          <div class="s-row">
+            <div class="s-input-group">
+              <label>City</label>
+              <input type="text" [(ngModel)]="profileData.City" name="City" placeholder="City">
+            </div>
+            <div class="s-input-group">
+              <label>State</label>
+              <input type="text" [(ngModel)]="profileData.State" name="State" placeholder="State">
+            </div>
+          </div>
+
+          <div class="s-row">
+            <div class="s-input-group">
+              <label>Postal Code</label>
+              <input type="text" [(ngModel)]="profileData.PostalCode" name="PostalCode" placeholder="ZIP">
+            </div>
+            <div class="s-input-group">
+              <label>Country</label>
+              <input type="text" [(ngModel)]="profileData.Country" name="Country" placeholder="Country">
+            </div>
+          </div>
+        </div>
+      
+      </div>
+
+      <div class="form-footer">
+        <div class="status-msg">
+           <div *ngIf="successMsg" class="alert success">{{ successMsg }}</div>
+           <div *ngIf="errorMsg" class="alert error">{{ errorMsg }}</div>
+        </div>
+        <button type="submit" class="s-btn-save" [disabled]="isLoading">
+          <span *ngIf="!isLoading">Save Profile Changes</span>
+          <span *ngIf="isLoading" class="spinner"></span>
+        </button>
+      </div>
+    </div>
+  </form>
+</div>

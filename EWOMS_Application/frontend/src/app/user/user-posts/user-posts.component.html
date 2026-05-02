@@ -1,0 +1,186 @@
+<div class="user-posts-container fade-in">
+  
+  <!-- VIEW MODE SELECTOR (Only for Admin/Manager when appropriate) -->
+  <div class="feed-view-nav" *ngIf="role === 'admin' && !userId && !showOnlyMyPosts">
+    <div class="nav-inner">
+      <button [class.active]="viewMode === 'list'" (click)="viewMode = 'list'">
+        <i class="bi bi-grid-3x3"></i> Feed
+      </button>
+      <button [class.active]="viewMode === 'table'" (click)="viewMode = 'table'">
+        <i class="bi bi-table"></i> Management
+      </button>
+    </div>
+  </div>
+
+  <!-- STORIES TRAY -->
+  <div class="stories-horizontal-hub custom-scroll" *ngIf="viewMode === 'list' && !showOnlyMyPosts">
+    <!-- ADD STORY -->
+    <div class="story-item" (click)="openStoryCreator()">
+      <div class="story-ring plus">
+        <div class="avatar-box">
+          <img [src]="getCurrentUserAvatar()" alt="You">
+          <div class="plus-badge"><i class="bi bi-plus-lg"></i></div>
+        </div>
+      </div>
+      <span class="story-name">Your Story</span>
+    </div>
+
+    <!-- FRIENDS STORIES -->
+    <div class="story-item" *ngFor="let s of stories" (click)="openStory(s)">
+      <div class="story-ring" [class.unseen]="s.hasUnseen">
+        <div class="avatar-box">
+          <img [src]="s.userImage ? (s.userImage.startsWith('data:image') || s.userImage.startsWith('http') ? s.userImage : 'data:image/jpeg;base64,' + s.userImage) : 'https://ui-avatars.com/api/?name=' + s.userName" alt="User">
+        </div>
+      </div>
+      <span class="story-name">{{ s.userName }}</span>
+    </div>
+  </div>
+
+  <!-- MAIN LIST FEED -->
+  <div class="list-feed-layout" *ngIf="viewMode === 'list'">
+    <div class="feed-loader" *ngIf="isLoading">
+      <div class="spinner-elite"></div>
+      <p>Syncing Feed...</p>
+    </div>
+
+    <div class="feed-posts" *ngIf="!isLoading && posts.length > 0">
+      <article class="insta-post-card fade-in" *ngFor="let post of posts">
+        <!-- HEADER -->
+        <header class="post-card-header">
+          <div class="author-block" (click)="onViewProfile(post.userId)">
+            <div class="author-avatar">
+              <img [src]="getAuthorAvatar(post)" alt="Avatar">
+            </div>
+            <div class="author-meta">
+              <span class="author-name">{{ post.userName }}</span>
+              <span class="post-location">{{ post.createdAt | date:'MMM d, h:mm a' }}</span>
+            </div>
+          </div>
+          <button class="post-more-btn" (click)="togglePostMenu(post.id, $event)">
+            <i class="bi bi-three-dots"></i>
+          </button>
+        </header>
+
+        <!-- MEDIA -->
+        <div class="post-media-stage" (dblclick)="likePost(post)">
+          <img [src]="'data:image/jpeg;base64,' + post.displayImage" alt="Intel Broadcast">
+        </div>
+
+        <!-- ENGAGEMENT -->
+        <div class="post-engagement-core">
+          <div class="action-buttons-row">
+            <div class="left-actions">
+              <button class="action-btn" [class.liked]="post.isLiked" (click)="likePost(post)">
+                <i class="bi" [ngClass]="post.isLiked ? 'bi-heart-fill' : 'bi-heart'"></i>
+              </button>
+              <button class="action-btn" (click)="toggleComments(post)">
+                <i class="bi bi-chat"></i>
+              </button>
+              <button class="action-btn"><i class="bi bi-send"></i></button>
+            </div>
+            <button class="action-btn bookmark" [class.active]="post.isSaved" (click)="savePost(post)">
+              <i class="bi" [ngClass]="post.isSaved ? 'bi-bookmark-fill' : 'bi-bookmark'"></i>
+            </button>
+          </div>
+
+          <div class="engagement-info">
+            <p class="likes-count" *ngIf="post.likeCount > 0">{{ post.likeCount }} likes</p>
+            <div class="post-caption">
+              <span class="caption-user" (click)="onViewProfile(post.userId)">{{ post.userName }}</span>
+              {{ post.caption }}
+            </div>
+            <button class="view-comments-btn" *ngIf="post.commentCount > 0" (click)="toggleComments(post)">
+              View all {{ post.commentCount }} comments
+            </button>
+            <span class="post-timestamp">{{ post.createdAt | date:'longDate' }}</span>
+          </div>
+
+          <!-- INLINE COMMENT -->
+          <div class="inline-comment-row">
+            <input type="text" placeholder="Add a comment..." [(ngModel)]="post.newCommentText" (keyup.enter)="submitComment(post)">
+            <button class="btn-post-comment" [disabled]="!post.newCommentText?.trim()" (click)="submitComment(post)">Post</button>
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <!-- EMPTY STATE -->
+    <div class="empty-feed" *ngIf="!isLoading && posts.length === 0">
+      <i class="bi bi-camera"></i>
+      <h3>No Posts Yet</h3>
+      <p>Content shared with the community will appear here.</p>
+    </div>
+  </div>
+
+  <!-- DISCOVERY GRID (Typically for Profile) -->
+  <div class="discovery-grid-elite" *ngIf="viewMode === 'grid'">
+    <div class="grid-layout">
+      <div class="grid-item" *ngFor="let post of posts" (click)="openPopup(post)">
+        <img [src]="'data:image/jpeg;base64,' + post.displayImage" alt="Post">
+        <div class="grid-overlay">
+          <div class="overlay-stats">
+            <span><i class="bi bi-heart-fill"></i> {{ post.likeCount }}</span>
+            <span><i class="bi bi-chat-fill"></i> {{ post.commentCount }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE-OUT COMMENTS PANEL -->
+<div class="comments-overlay" *ngIf="showComments" (click)="closeComments()">
+  <div class="comments-panel" (click)="$event.stopPropagation()">
+    <div class="comments-header">
+      <h3>Comments</h3>
+      <button class="close-panel-btn" (click)="closeComments()">×</button>
+    </div>
+    <div class="comments-list-stream">
+      <div class="comment-item" *ngFor="let comment of currentPostComments">
+        <span class="c-user">{{ comment.userName }}</span>
+        <p class="c-text">{{ comment.content }}</p>
+      </div>
+    </div>
+    <div class="comment-input-area">
+      <input [(ngModel)]="newCommentText" placeholder="Add a comment..." (keyup.enter)="submitComment()">
+      <button (click)="submitComment()">Post</button>
+    </div>
+  </div>
+</div>
+
+<!-- STORY VIEWER -->
+<div class="story-viewer-overlay" *ngIf="activeStory" (click)="closeStory()">
+  <div class="story-viewer-card" (click)="$event.stopPropagation()">
+    <div class="story-viewer-header">
+      <div class="v-user">
+        <img [src]="activeStory.userImage ? (activeStory.userImage.startsWith('data:image') || activeStory.userImage.startsWith('http') ? activeStory.userImage : 'data:image/jpeg;base64,' + activeStory.userImage) : 'https://ui-avatars.com/api/?name=' + activeStory.userName" alt="User">
+        <span>{{ activeStory.userName }}</span>
+      </div>
+      <button class="v-close" (click)="closeStory()">×</button>
+    </div>
+    <div class="story-viewer-content">
+      <img [src]="activeStory.segments[activeStory.currentSegmentIndex].displayImage.startsWith('data:') ? activeStory.segments[activeStory.currentSegmentIndex].displayImage : 'data:image/jpeg;base64,' + activeStory.segments[activeStory.currentSegmentIndex].displayImage" alt="Story" class="main-story-img">
+    </div>
+  </div>
+</div>
+
+<!-- STORY CREATOR MODAL -->
+<div class="story-creator-overlay" *ngIf="showStoryCreator" (click)="closeStoryCreator()">
+  <div class="story-creator-card" (click)="$event.stopPropagation()">
+    <div class="creator-header">
+      <h4>Create Story</h4>
+      <button class="close-btn" (click)="closeStoryCreator()">×</button>
+    </div>
+    <div class="creator-body">
+      <div class="story-dropzone" (click)="storyFileInput.click()">
+        <input type="file" #storyFileInput hidden (change)="onStoryFileSelected($event)" accept="image/*">
+        <img [src]="storyImagePreview" *ngIf="storyImagePreview" class="preview-img">
+        <div *ngIf="!storyImagePreview">Select Photo</div>
+      </div>
+      <textarea [(ngModel)]="storyCaption" placeholder="Add a caption..."></textarea>
+    </div>
+    <div class="creator-footer">
+      <button (click)="submitStory()" [disabled]="!selectedStoryFile">Share</button>
+    </div>
+  </div>
+</div>

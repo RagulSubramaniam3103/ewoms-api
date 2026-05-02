@@ -1,0 +1,319 @@
+<div class="enterprise-messenger">
+  <!-- SIDEBAR -->
+  <aside class="messenger-sidebar">
+    <div class="sidebar-tabs glass-panel">
+      <button [class.active]="activeTab === 'chats'" (click)="switchTab('chats')" title="Direct Chats">
+        <i class="bi bi-chat-dots-fill"></i>
+      </button>
+      <button [class.active]="activeTab === 'groups'" (click)="switchTab('groups')" title="Group Chats">
+        <i class="bi bi-people-fill"></i>
+      </button>
+      <button [class.active]="activeTab === 'requests'" (click)="switchTab('requests')" title="Friend Requests">
+        <i class="bi bi-person-check-fill"></i>
+        <span class="badge-mini" *ngIf="friendRequests.length > 0"></span>
+      </button>
+      <button [class.active]="activeTab === 'add'" (click)="switchTab('add')" title="Search People">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+
+    <div class="sidebar-content custom-scroll">
+      <!-- SEARCH / ADD FRIENDS -->
+      <div class="search-box" *ngIf="activeTab === 'add'">
+        <div class="search-input-wrap">
+          <i class="bi bi-search"></i>
+          <input type="text" class="premium-input" placeholder="Search people..." [(ngModel)]="searchKey" (keyup)="searchUsers()">
+        </div>
+        <div class="chat-list">
+          <div class="chat-item" *ngFor="let u of searchResults">
+            <div class="avatar-container">
+              <img *ngIf="getAvatar(u)" [src]="getAvatar(u)" class="avatar-img">
+              <div *ngIf="!getAvatar(u)" class="avatar">{{ u.fullName?.charAt(0) || 'U' }}</div>
+            </div>
+            <div class="chat-info">
+              <span class="user-name">{{ u.fullName }}</span>
+              <span class="last-msg">{{ u.requestSent ? (u.requestMessage || 'Requested') : 'Enterprise Member' }}</span>
+            </div>
+            <button class="create-group-btn" *ngIf="!u.requestSent" (click)="sendRequest(u.userId)">
+              <i class="bi bi-person-plus-fill"></i>
+            </button>
+            <button class="create-group-btn requested" *ngIf="u.requestSent" disabled>
+              <i class="bi bi-clock-history"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- GROUPS LIST -->
+      <div class="chat-list" *ngIf="activeTab === 'groups'">
+        <div class="group-list-header">
+          <span>Your Collaborations</span>
+          <button class="create-group-btn" (click)="openCreateGroup()" title="Create New Group">
+            <i class="bi bi-plus-lg"></i>
+          </button>
+        </div>
+        <div *ngIf="groups.length === 0" class="empty-state" style="padding: 2rem;">
+          <p style="font-size: 0.9rem; color: #64748b;">No active groups</p>
+        </div>
+        <div class="chat-item"
+             *ngFor="let g of groups"
+             [class.active]="selectedGroup?.groupId === g.groupId"
+             (click)="openGroup(g)">
+          <div class="group-avatar-cluster">
+            <ng-container *ngFor="let m of (getGroupPreviewMembers(g)); let i = index">
+              <img *ngIf="getGroupMemberAvatar(m)"
+                   [src]="getGroupMemberAvatar(m)"
+                   class="cluster-avatar"
+                   [style.z-index]="10 - i"
+                   [style.left.px]="i * 14">
+              <div *ngIf="!getGroupMemberAvatar(m)"
+                   class="cluster-avatar cluster-fallback"
+                   [style.z-index]="10 - i"
+                   [style.left.px]="i * 14">
+                {{ m.fullName?.charAt(0) || 'U' }}
+              </div>
+            </ng-container>
+            <div class="cluster-more"
+                 *ngIf="g.memberCount > 3"
+                 [style.left.px]="3 * 14">
+              +{{ g.memberCount - 3 }}
+            </div>
+          </div>
+          <div class="chat-info">
+            <div class="name-unread">
+              <span class="user-name">{{ g.name }}</span>
+              <span class="group-badge">{{ g.memberCount }}</span>
+            </div>
+            <span class="last-msg">{{ g.lastMessage || 'Start collaborating...' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- DIRECT CHATS -->
+      <div class="chat-list" *ngIf="activeTab === 'chats'">
+        <div class="chat-item" 
+             *ngFor="let u of users" 
+             [class.active]="selectedFriend?.userId === u.userId"
+             (click)="selectUser(u)">
+          <div class="avatar-container">
+            <img *ngIf="getAvatar(u)" [src]="getAvatar(u)" class="avatar-img">
+            <div *ngIf="!getAvatar(u)" class="avatar">{{ u.fullName?.charAt(0) || 'U' }}</div>
+            <div class="status-dot" *ngIf="onlineUsers.has(u.userId)"></div>
+            <span class="avatar-unread-badge" *ngIf="u.unreadCount > 0">{{ u.unreadCount }}</span>
+          </div>
+          <div class="chat-info">
+            <div class="name-unread">
+              <span class="user-name">{{ u.fullName }}</span>
+            </div>
+            <span class="last-msg" [class.unread-text]="u.unreadCount > 0">{{ u.lastMessage || 'Send a message' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- REQUESTS LIST -->
+      <div class="chat-list" *ngIf="activeTab === 'requests'">
+        <div class="group-list-header">
+          <span>Inbound Requests</span>
+        </div>
+        <div *ngIf="friendRequests.length === 0" class="empty-state" style="padding: 2rem;">
+          <p style="font-size: 0.9rem; color: #64748b;">All caught up!</p>
+        </div>
+        <div class="chat-item" *ngFor="let r of friendRequests">
+          <div class="avatar-container">
+            <img *ngIf="getAvatar(r.sender)" [src]="getAvatar(r.sender)" class="avatar-img">
+            <div *ngIf="!getAvatar(r.sender)" class="avatar">{{ r.sender?.fullName?.charAt(0) || 'U' }}</div>
+          </div>
+          <div class="chat-info">
+            <span class="user-name">{{ r.sender?.fullName }}</span>
+            <span class="last-msg">Incoming request</span>
+          </div>
+          <div class="header-actions" style="gap: 0.5rem;">
+            <button class="create-group-btn" (click)="acceptRequest(r.id)" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
+              <i class="bi bi-check-lg"></i>
+            </button>
+            <button class="create-group-btn" (click)="declineRequest(r.id)" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;">
+              <i class="bi bi-x-lg"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN CHAT AREA -->
+  <main class="chat-area" *ngIf="selectedFriend || selectedGroup">
+    <header class="chat-header">
+      <div class="chat-user-info" (click)="selectedGroup ? openGroupInfo() : onViewProfile()">
+        <div class="avatar-container">
+          <img *ngIf="getAvatar(selectedFriend || selectedGroup)" [src]="getAvatar(selectedFriend || selectedGroup)" class="avatar-img">
+          <div *ngIf="!getAvatar(selectedFriend || selectedGroup)" class="avatar" [class.group-avatar]="selectedGroup">
+            {{ (selectedFriend?.fullName || selectedGroup?.name)?.charAt(0) }}
+          </div>
+          <div class="status-dot" *ngIf="selectedFriend && onlineUsers.has(selectedFriend.userId)"></div>
+        </div>
+        <div class="header-details">
+          <span class="user-name">{{ selectedFriend?.fullName || selectedGroup?.name }}</span>
+          <span class="status-text" *ngIf="selectedFriend" [class.offline]="!onlineUsers.has(selectedFriend.userId)">
+            {{ onlineUsers.has(selectedFriend.userId) ? 'Available Now' : 'Currently Offline' }}
+          </span>
+          <span class="status-text" *ngIf="selectedGroup">{{ groupMembers.length }} Members active</span>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="h-action-btn" title="Voice Channel"><i class="bi bi-mic-fill"></i></button>
+        <button class="h-action-btn" title="Video Meeting"><i class="bi bi-camera-video-fill"></i></button>
+        <button class="h-action-btn" *ngIf="selectedGroup" (click)="openGroupInfo()" title="Group Intelligence"><i class="bi bi-info-circle-fill"></i></button>
+      </div>
+    </header>
+
+    <div class="message-list custom-scroll" #scrollMe>
+      <ng-container *ngFor="let msg of (selectedGroup ? groupMessages : messages)">
+        <div class="message-item" [class.sent]="msg.senderId === currentUserId || isGroupSender(msg)">
+          <div class="msg-avatar" *ngIf="selectedGroup && !isGroupSender(msg)">
+             <img *ngIf="msg.senderImage" [src]="'data:image/jpeg;base64,' + msg.senderImage" class="avatar-img mini">
+             <div *ngIf="!msg.senderImage" class="avatar mini">{{ msg.senderName?.charAt(0) || 'U' }}</div>
+          </div>
+          <div class="msg-bubble-container">
+            <span class="sender-name" *ngIf="selectedGroup && !isGroupSender(msg)">{{ msg.senderName }}</span>
+            <div class="msg-bubble">
+              <div class="image-msg" *ngIf="msg.image">
+                <img [src]="msg.image.startsWith('data:') ? msg.image : 'data:image/jpeg;base64,' + msg.image" 
+                     (click)="openImagePopup(msg.image.startsWith('data:') ? msg.image : 'data:image/jpeg;base64,' + msg.image)"
+                     alt="Shared Media">
+              </div>
+              <p *ngIf="msg.content || msg.message">{{ msg.content || msg.message }}</p>
+              <span class="msg-time">{{ (msg.timestamp || msg.sentAt) | date:'shortTime' }}</span>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+
+    <footer class="chat-footer">
+      <div class="attachment-preview" *ngIf="selectedImage || groupImagePreview">
+        <img [src]="selectedImage || groupImagePreview" alt="Preview">
+        <button class="remove-attachment" (click)="selectedImage = null; groupImagePreview = null">×</button>
+      </div>
+      <div class="input-area">
+        <button class="f-action-btn" (click)="fileInput.click()" title="Share Media">
+          <i class="bi bi-plus-circle-fill"></i>
+          <input type="file" #fileInput style="display:none" (change)="onFileSelected($event)" accept="image/*">
+        </button>
+        <textarea placeholder="Type your message..." 
+                  [(ngModel)]="newMessage" 
+                  (keydown.enter)="$event.preventDefault(); sendMessage()"
+                  rows="1"></textarea>
+        <button class="send-btn" (click)="sendMessage()" [disabled]="!newMessage.trim() && !selectedImage && !groupImagePreview">
+          <i class="bi bi-send-fill"></i>
+        </button>
+      </div>
+    </footer>
+  </main>
+
+  <!-- EMPTY CHAT -->
+  <main class="chat-area empty" *ngIf="!selectedFriend && !selectedGroup">
+    <div class="empty-state">
+      <div class="empty-icon glass-panel"><i class="bi bi-grid-fill"></i></div>
+      <h2>Secure Workspace</h2>
+      <p>Select a verified contact or collaborative group to begin secure communication.</p>
+      <button class="primary-btn" (click)="switchTab('add')">Establish Connection</button>
+    </div>
+  </main>
+
+  <!-- MODALS -->
+  <div class="simple-modal-overlay" *ngIf="selectedGroup && showGroupDetails" (click)="showGroupDetails = false">
+    <div class="user-popup-card" (click)="$event.stopPropagation()">
+      <div style="padding: 2rem;">
+        <div style="display: flex; align-items: center; gap: 1.5rem; margin-bottom: 2rem;">
+          <div class="avatar" style="width: 80px; height: 80px; font-size: 2rem; background: #6366f1; color: white; border: none;">
+            {{ selectedGroup.name?.charAt(0) | uppercase }}
+          </div>
+          <div>
+            <h3 style="font-size: 1.25rem; color: #111827; margin: 0;">{{ selectedGroup.name }}</h3>
+            <p style="color: #6b7280; margin: 4px 0 0;">{{ groupMembers.length }} Members</p>
+          </div>
+        </div>
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <span style="font-weight: 700; color: #6b7280; font-size: 0.75rem; text-transform: uppercase;">Team Roster</span>
+          <button class="create-group-btn" (click)="openAddGroupMemberModal()" style="width: auto; padding: 0 12px; height: 32px; font-size: 0.8rem;">+ Add Member</button>
+        </div>
+        
+        <div class="custom-scroll" style="max-height: 250px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.5rem;">
+          <div *ngFor="let m of groupMembers" style="display: flex; align-items: center; gap: 0.75rem; padding: 0.6rem; background: #f9fafb; border-radius: 10px; border: 1px solid #f3f4f6;">
+            <img *ngIf="getGroupMemberAvatar(m)" [src]="getGroupMemberAvatar(m)" style="width: 32px; height: 32px; border-radius: 8px;">
+            <div *ngIf="!getGroupMemberAvatar(m)" class="avatar mini" style="width: 32px; height: 32px; font-size: 0.8rem;">{{ m.fullName?.charAt(0) }}</div>
+            <span style="font-weight: 600; color: #111827; flex: 1; font-size: 0.9rem;">{{ m.fullName }}</span>
+            <span *ngIf="m.isAdmin" style="font-size: 0.6rem; color: #6366f1; font-weight: 800; text-transform: uppercase;">Admin</span>
+          </div>
+        </div>
+
+        <button (click)="leaveGroup()" style="width: 100%; margin-top: 1.5rem; padding: 0.7rem; background: #fef2f2; color: #ef4444; border: 1px solid #fee2e2; border-radius: 10px; font-weight: 700; cursor: pointer; transition: all 0.2s;">
+          Leave Cluster
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADD MEMBER MODAL -->
+  <div class="simple-modal-overlay" *ngIf="showAddGroupMemberModal" (click)="closeAddGroupMemberModal()">
+    <div class="user-popup-card" (click)="$event.stopPropagation()">
+      <div style="padding: 1.5rem;">
+        <h3 style="margin-bottom: 1.25rem; color: #111827;">Expand Team</h3>
+        <div class="custom-scroll" style="max-height: 300px; overflow-y: auto;">
+          <div class="chat-item" *ngFor="let f of friendsToAdd" (click)="addGroupMember(f.userId)">
+            <img *ngIf="getAvatar(f)" [src]="getAvatar(f)" class="avatar-img small">
+            <div *ngIf="!getAvatar(f)" class="avatar small">{{ f.fullName?.charAt(0) }}</div>
+            <div class="chat-info" style="margin-left: 1rem;">
+              <span class="user-name">{{ f.fullName }}</span>
+              <span class="last-msg">Available to join</span>
+            </div>
+            <i class="bi bi-plus-lg" style="color: #6366f1;"></i>
+          </div>
+          <div *ngIf="friendsToAdd.length === 0" style="padding: 2rem; text-align: center; color: #64748b;">
+            <p>No connections available</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CREATE GROUP MODAL -->
+  <div class="simple-modal-overlay" *ngIf="showCreateGroup" (click)="closeCreateGroup()">
+    <div class="user-popup-card" (click)="$event.stopPropagation()">
+      <div style="padding: 2rem;">
+        <h3 style="margin-bottom: 1.5rem; color: #111827; font-size: 1.25rem;">Initiate Cluster</h3>
+        <div class="search-input-wrap">
+          <input type="text" [(ngModel)]="newGroupName" placeholder="Cluster Designation" style="background: white; border: 1px solid #e5e7eb; padding: 0.75rem; border-radius: 12px; margin-bottom: 1rem;">
+        </div>
+        
+        <span style="font-weight: 700; color: #9ca3af; font-size: 0.7rem; text-transform: uppercase; display: block; margin-bottom: 0.75rem;">Select Personnel</span>
+        <div class="custom-scroll" style="max-height: 180px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.25rem; margin-bottom: 1.5rem;">
+          <div *ngFor="let f of friends" 
+               (click)="toggleGroupMember(f.userId)" 
+               [style.background]="isMemberSelected(f.userId) ? '#eff6ff' : 'transparent'"
+               [style.border-color]="isMemberSelected(f.userId) ? '#dbeafe' : 'transparent'"
+               style="display: flex; align-items: center; gap: 0.75rem; padding: 0.6rem; cursor: pointer; border-radius: 10px; border: 1px solid transparent; transition: all 0.2s;">
+            <img *ngIf="getAvatar(f)" [src]="getAvatar(f)" style="width: 28px; height: 28px; border-radius: 6px;">
+            <div *ngIf="!getAvatar(f)" class="avatar mini" style="width: 28px; height: 28px; font-size: 0.75rem;">{{ f.fullName?.charAt(0) }}</div>
+            <span style="flex: 1; font-size: 0.85rem; color: #111827;">{{ f.fullName }}</span>
+            <i class="bi bi-check-circle-fill" *ngIf="isMemberSelected(f.userId)" style="color: #6366f1;"></i>
+          </div>
+        </div>
+        
+        <div style="display: flex; gap: 0.75rem;">
+          <button (click)="closeCreateGroup()" style="flex: 1; padding: 0.75rem; border: none; background: #f3f4f6; color: #6b7280; border-radius: 12px; font-weight: 700; cursor: pointer;">Abort</button>
+          <button (click)="createGroup()" [disabled]="!newGroupName.trim()" class="primary-btn" style="flex: 1; padding: 0.75rem;">Create</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- IMAGE VIEWER MODAL -->
+  <div class="image-viewer-overlay" *ngIf="fullScreenImage" (click)="closeImagePopup()">
+    <div class="image-viewer-content" (click)="$event.stopPropagation()">
+      <button class="viewer-close" (click)="closeImagePopup()">×</button>
+      <img [src]="fullScreenImage" alt="Full Preview">
+    </div>
+  </div>
+</div>

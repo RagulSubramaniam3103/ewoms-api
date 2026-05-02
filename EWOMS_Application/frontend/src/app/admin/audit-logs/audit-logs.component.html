@@ -1,0 +1,104 @@
+<div class="view-panel fade-in">
+    <div class="panel-header">
+        <div class="header-left">
+            <div class="title-badge">Security Audit</div>
+            <h3>Administrative Audit Logs</h3>
+            <p>Real-time transparency tracking for all operational interventions.</p>
+        </div>
+        <div class="header-actions">
+            <button class="btn-refresh-modern" (click)="fetchLogs()" [class.spinning]="isLoading">
+                <i class="bi bi-arrow-clockwise"></i>
+                <span>Sync Logs</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="log-explorer">
+        <div class="explorer-toolbar">
+            <div class="search-glass">
+                <i class="bi bi-search"></i>
+                <input type="text" placeholder="Filter by admin, action, or target ID..." [(ngModel)]="searchTerm" (input)="onSearch()">
+            </div>
+            
+            <div class="pagination-glass" *ngIf="totalPages > 1">
+                <button [disabled]="currentPage === 1" (click)="changePage(-1)" class="btn-page"><i class="bi bi-chevron-left"></i></button>
+                <span class="page-counter">Page <strong>{{ currentPage }}</strong> / {{ totalPages }}</span>
+                <button [disabled]="currentPage === totalPages" (click)="changePage(1)" class="btn-page"><i class="bi bi-chevron-right"></i></button>
+            </div>
+        </div>
+
+        <div *ngIf="isLoading" class="loading-state">
+            <div class="modern-loader">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div>
+            <p>Fetching secure intelligence...</p>
+        </div>
+
+        <div class="logs-container" *ngIf="!isLoading">
+             <div class="table-wrapper">
+                 <table class="modern-log-table">
+                     <thead>
+                         <tr>
+                             <th>Timeline</th>
+                             <th>Operator</th>
+                             <th>Intervention</th>
+                             <th>Target Asset</th>
+                             <th>Execution Details</th>
+                             <th>Origin</th>
+                         </tr>
+                     </thead>
+                     <tbody>
+                         <tr *ngFor="let log of paginatedLogs" class="log-entry">
+                             <td class="time-cell">
+                                 <div class="time-wrap">
+                                     <span class="date">{{ log.timestamp | date:'MMM d' }}</span>
+                                     <span class="hour">{{ log.timestamp | date:'h:mm:ss a' }}</span>
+                                 </div>
+                             </td>
+                             <td class="operator-cell">
+                                 <div class="operator-pill">
+                                     <div class="op-avatar">{{ log.adminName.substring(0,1) }}</div>
+                                     <div class="op-info">
+                                         <span class="op-name">{{ log.adminName }}</span>
+                                         <span class="op-id">ID: {{ log.adminId }}</span>
+                                     </div>
+                                 </div>
+                             </td>
+                             <td class="action-cell">
+                                 <div class="action-status" [ngClass]="log.action.toLowerCase().replace(' ', '-')">
+                                     <span class="status-dot"></span>
+                                     <span class="status-label">{{ log.action }}</span>
+                                 </div>
+                             </td>
+                             <td class="target-cell">
+                                 <div class="target-card">
+                                     <span class="target-name">{{ log.targetName || 'System' }}</span>
+                                     <span class="target-sub" *ngIf="log.targetId">ID: {{ log.targetId }}</span>
+                                 </div>
+                             </td>
+                             <td class="details-cell">
+                                 <div class="details-bubble">
+                                    {{ log.details }}
+                                 </div>
+                             </td>
+                             <td class="origin-cell">
+                                 <div class="ip-badge">
+                                     <i class="bi bi-geo-alt"></i>
+                                     <span>{{ log.ipAddress || 'Internal' }}</span>
+                                 </div>
+                             </td>
+                         </tr>
+                         <tr *ngIf="paginatedLogs.length === 0">
+                             <td colspan="6" class="no-logs-state">
+                                 <i class="bi bi-search"></i>
+                                 <p>No audit matching your criteria found.</p>
+                             </td>
+                         </tr>
+                     </tbody>
+                 </table>
+             </div>
+        </div>
+    </div>
+</div>

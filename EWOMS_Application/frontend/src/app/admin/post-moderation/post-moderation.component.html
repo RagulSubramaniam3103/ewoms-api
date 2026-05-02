@@ -1,0 +1,96 @@
+<div class="view-panel fade-in">
+  <!-- ELITE MODERATION HEADER -->
+  <header class="moderation-header">
+    <div class="mod-title-group">
+      <h3>Post Moderation</h3>
+      <p>Review and manage community intelligence broadcasts.</p>
+    </div>
+    
+    <div class="mod-stats glass-panel">
+      <div class="stat-item">
+        <span class="label-small">Pending Review</span>
+        <span class="val-stat">{{ unblurredPostsCount }}</span>
+      </div>
+      <div class="stat-item">
+        <span class="label-small">Filtered Intel</span>
+        <span class="val-stat filtered">{{ blurredPostsCount }}</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="moderation-body">
+    <!-- TOOLBAR -->
+    <div class="mod-toolbar">
+      <div class="search-nexus">
+        <i class="bi bi-filter-square"></i>
+        <input type="text" placeholder="Filter by personnel or content..." [(ngModel)]="searchTerm" (input)="onSearchChange()">
+      </div>
+
+      <div class="mod-tabs-nexus">
+        <button [class.active]="currentTab === 'all'" (click)="setTab('all')">All Reports</button>
+        <button [class.active]="currentTab === 'blurred'" (click)="setTab('blurred')">Restricted</button>
+      </div>
+    </div>
+
+    <!-- MODERATION GRID -->
+    <div class="moderation-grid">
+      <div *ngIf="isLoading" class="loader-box">
+        <div class="spinner-nexus"></div>
+        <p>Syncing Content Stream...</p>
+      </div>
+
+      <div class="mod-card glass-panel fade-in" *ngFor="let post of paginatedPosts">
+        <div class="mod-card-header">
+          <div class="author-info">
+            <img [src]="getAuthorAvatar(post)">
+            <div class="u-meta">
+              <span class="u-name">{{ post.userName }}</span>
+              <span class="u-date">{{ post.createdAt | date:'shortTime' }}</span>
+            </div>
+          </div>
+          <span class="status-indicator" [class.is-blurred]="post.isBlurred">
+            {{ post.isBlurred ? 'FILTERED' : 'LIVE' }}
+          </span>
+        </div>
+
+        <div class="mod-media-box" (click)="openImagePopup(post, $event)">
+          <img [src]="'data:image/webp;base64,' + post.displayImage" [class.blur-fx]="post.isBlurred">
+          <div class="blur-overlay-mini" *ngIf="post.isBlurred">
+            <i class="bi bi-eye-slash"></i>
+          </div>
+        </div>
+
+        <div class="mod-caption">
+          <p>{{ post.caption }}</p>
+        </div>
+
+        <div class="mod-actions">
+          <button class="btn-mod unblur" *ngIf="post.isBlurred" (click)="toggleBlur(post)">
+            <i class="bi bi-eye"></i> Restore
+          </button>
+          <button class="btn-mod blur" *ngIf="!post.isBlurred" (click)="toggleBlur(post)">
+            <i class="bi bi-eye-slash"></i> Restrict
+          </button>
+          <button class="btn-mod archive" (click)="archivePost(post)">
+            <i class="bi bi-archive"></i> Archive
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- PAGINATION CONTROLS -->
+    <div class="mod-pagination-nexus" *ngIf="totalPages > 1">
+      <button class="pg-btn" [disabled]="currentPage === 1" (click)="prevPage()">
+        <i class="bi bi-chevron-left"></i>
+      </button>
+      
+      <div class="pg-info">
+        Page <span>{{ currentPage }}</span> of {{ totalPages }}
+      </div>
+      
+      <button class="pg-btn" [disabled]="currentPage === totalPages" (click)="nextPage()">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </div>
+</div>

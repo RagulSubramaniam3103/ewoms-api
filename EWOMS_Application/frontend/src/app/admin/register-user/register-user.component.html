@@ -1,0 +1,97 @@
+<div class="registration-hub fade-in">
+  <div class="hub-header">
+    <div class="header-icon"><i class="bi bi-person-plus-fill"></i></div>
+    <div class="header-text">
+      <h2>Personnel Activation</h2>
+      <p>Synchronize new intelligence assets to the EWOMS ecosystem.</p>
+    </div>
+  </div>
+
+  <div class="hub-canvas glass-panel">
+    <!-- STATUS FEEDBACK -->
+    <div class="status-box success" *ngIf="successMessage">
+      <i class="bi bi-check-circle-fill"></i>
+      <span>{{ successMessage }}</span>
+    </div>
+    <div class="status-box error" *ngIf="errorMessage">
+      <i class="bi bi-exclamation-triangle-fill"></i>
+      <span>{{ errorMessage }}</span>
+    </div>
+
+    <form class="activation-form" [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+      <div class="form-grid">
+        <!-- AVATAR UPLOAD -->
+        <div class="avatar-section">
+          <div class="avatar-pod" (click)="fileInput.click()">
+            <img [src]="imagePreview" *ngIf="imagePreview" alt="Preview">
+            <div class="pod-placeholder" *ngIf="!imagePreview">
+              <i class="bi bi-camera"></i>
+            </div>
+            <div class="pod-overlay"><i class="bi bi-plus-lg"></i></div>
+          </div>
+          <input type="file" #fileInput hidden (change)="onFileSelected($event)" accept="image/*">
+          <span class="pod-label">Identity Visual</span>
+        </div>
+
+        <!-- IDENTITY FIELDS -->
+        <div class="fields-section">
+          <div class="field-row">
+            <div class="field-group">
+              <label>Full Name</label>
+              <div class="input-nexus" [class.error]="f['FullName'].touched && f['FullName'].invalid">
+                <i class="bi bi-person"></i>
+                <input type="text" formControlName="FullName" placeholder="Enter personnel name">
+              </div>
+            </div>
+            <div class="field-group">
+              <label>System Username</label>
+              <div class="input-nexus" [class.error]="f['UserName'].touched && f['UserName'].invalid">
+                <i class="bi bi-at"></i>
+                <input type="text" formControlName="UserName" placeholder="system_handle">
+              </div>
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field-group">
+              <label>Secure Email</label>
+              <div class="input-nexus" [class.error]="f['Email'].touched && f['Email'].invalid">
+                <i class="bi bi-envelope"></i>
+                <input type="email" formControlName="Email" placeholder="personnel@ewoms.sys">
+              </div>
+            </div>
+            <div class="field-group">
+              <label>Access Level</label>
+              <div class="input-nexus">
+                <i class="bi bi-shield-lock"></i>
+                <select formControlName="UserRole">
+                  <option value="Admin">System Administrator</option>
+                  <option value="Manager">Department Manager</option>
+                  <option value="User">Standard Personnel</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field-group">
+              <label>Initial Password</label>
+              <div class="input-nexus" [class.error]="f['Password'].touched && f['Password'].invalid">
+                <i class="bi bi-key"></i>
+                <input type="password" formControlName="Password" placeholder="••••••••">
+              </div>
+              <small class="field-hint" *ngIf="f['Password'].touched && f['Password'].errors?.['minlength']">Minimum 6 characters required.</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-footer">
+        <button type="submit" class="btn-activate-personnel" [disabled]="isLoading">
+          <span *ngIf="!isLoading">Activate Personnel</span>
+          <span *ngIf="isLoading" class="loader-nexus"></span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

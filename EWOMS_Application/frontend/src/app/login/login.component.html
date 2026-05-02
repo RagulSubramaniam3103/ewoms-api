@@ -1,0 +1,148 @@
+<div class="login-page-container">
+  <div class="branding-section">
+    <div class="brand-content">
+      <div class="brand-logo">E</div>
+      <h1>MOMENTUM</h1>
+      <p>Strategic Workforce Intelligence & Operations</p>
+      <div class="feature-pills">
+        <span class="pill">Secure</span>
+        <span class="pill">Efficient</span>
+        <span class="pill">Scalable</span>
+      </div>
+    </div>
+    <div class="abstract-blobs">
+      <div class="blob blob-1"></div>
+      <div class="blob blob-2"></div>
+    </div>
+  </div>
+
+  <div class="form-section">
+    <div class="login-card-v2 fade-in">
+      <div class="v2-header">
+        <h2 *ngIf="!isRegisterMode">Welcome Back</h2>
+        <p *ngIf="!isRegisterMode">Login to your workspace to continue.</p>
+
+        <h2 *ngIf="isRegisterMode">Create Account</h2>
+        <p *ngIf="isRegisterMode">Register a new profile to get started.</p>
+      </div>
+
+      <div *ngIf="successMessage" class="success-toast" style="background: rgba(34, 197, 94, 0.1); color: #22c55e; padding: 12px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-size: 0.9rem; border: 1px solid rgba(34, 197, 94, 0.2);">
+        {{ successMessage }}
+      </div>
+
+      <form *ngIf="!isRegisterMode" [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="v2-form">
+        <div *ngIf="errorMessage" class="error-toast">
+          {{ errorMessage }}
+        </div>
+
+        <div class="v2-field">
+          <label>Email Address</label>
+          <div class="v2-input-wrap">
+            <svg class="field-icon" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+            <input type="email" formControlName="email" placeholder="name@company.com">
+          </div>
+        </div>
+        
+        <div class="v2-field">
+          <label>Password</label>
+          <div class="v2-input-wrap">
+            <svg class="field-icon" viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+            <input type="password" formControlName="password" placeholder="••••••••">
+          </div>
+        </div>
+
+        <button type="submit" class="v2-auth-btn" [disabled]="isLoading">
+          <span *ngIf="!isLoading">Authorize Access</span>
+          <span *ngIf="isLoading" class="spinner-v2"></span>
+        </button>
+
+        <div class="v2-footer">
+          <a routerLink="/forgot-password" class="v2-link">Forgot password?</a>
+          <span class="v2-helper">Don't have an account? <a href="#" (click)="toggleMode($event)">Register</a></span>
+        </div>
+        <div class="v2-copyright-wrap">
+          <span class="v2-copy">&copy; 2026 EWOMS Enterprise</span>
+        </div>
+      </form>
+
+      <form *ngIf="isRegisterMode" [formGroup]="registerForm" (ngSubmit)="onRegister()" class="v2-form">
+        <div *ngIf="errorMessage" class="error-toast">
+          {{ errorMessage }}
+        </div>
+
+        <div class="v2-grid">
+          <div class="v2-field">
+            <label>Full Name</label>
+            <div class="v2-input-wrap">
+              <svg class="field-icon" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+              <input type="text" formControlName="FullName" placeholder="John Doe">
+            </div>
+          </div>
+  
+          <div class="v2-field">
+            <label>Username</label>
+            <div class="v2-input-wrap">
+              <svg class="field-icon" viewBox="0 0 24 24"><path d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+              <input type="text" formControlName="UserName" placeholder="johndoe123">
+            </div>
+          </div>
+        </div>
+
+        <div class="v2-field">
+          <label>Email Address</label>
+          <div class="v2-input-wrap">
+            <svg class="field-icon" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+            <input type="email" formControlName="Email" placeholder="name@company.com">
+          </div>
+        </div>
+        
+        <div class="v2-grid">
+          <div class="v2-field">
+            <label>Password</label>
+            <div class="v2-input-wrap">
+              <svg class="field-icon" viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+              <input type="password" formControlName="Password" placeholder="••••••••">
+            </div>
+          </div>
+  
+          <div class="v2-field">
+            <label>Role</label>
+            <div class="v2-input-wrap role-select-wrap">
+              <svg class="field-icon" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+              <select formControlName="UserRole">
+                <option value="User">User</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="v2-field">
+          <label>Profile Identity</label>
+          <div class="avatar-upload-zone" (click)="fileInput.click()">
+            <div class="upload-content" *ngIf="!selectedFileName">
+              <svg viewBox="0 0 24 24" class="upload-icon"><path d="M3 4V1h2v3h3v2H5v3H3V6H0V4h3zm3 6V7h3V4h7l1.83 2H21c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H5c-1.1 0-2-.9-2-2V10h3zm7 9c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-3.2-5c0 1.77 1.43 3.2 3.2 3.2s3.2-1.43 3.2-3.2-1.43-3.2-3.2-3.2-3.2 1.43-3.2 3.2z"/></svg>
+              <span>Set Profile Picture</span>
+            </div>
+            <div class="upload-content active" *ngIf="selectedFileName">
+              <svg viewBox="0 0 24 24" class="upload-icon success"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+              <span>{{ selectedFileName }}</span>
+            </div>
+            <input type="file" #fileInput (change)="onFileSelected($event)" accept="image/*" hidden>
+          </div>
+        </div>
+
+        <button type="submit" class="v2-auth-btn" [disabled]="isLoading">
+          <span *ngIf="!isLoading">Register Account</span>
+          <span *ngIf="isLoading" class="spinner-v2"></span>
+        </button>
+
+        <div class="v2-footer centered">
+          <span class="v2-helper">Already have an account? <a href="#" (click)="toggleMode($event)">Login here</a></span>
+        </div>
+        <div class="v2-copyright-wrap">
+          <span class="v2-copy">&copy; 2026 EWOMS Enterprise</span>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
