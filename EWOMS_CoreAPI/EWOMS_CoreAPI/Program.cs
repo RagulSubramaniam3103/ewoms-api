@@ -237,44 +237,47 @@ using (var scope = app.Services.CreateScope())
         }
     }
 
-    // Ensure Backup Tables Exist (SQLite Syntax)
+    // Ensure Backup Tables Exist (SQL Server Syntax)
     string createBackupTablesSql = @"
-        CREATE TABLE IF NOT EXISTS [EWO_MasterUserBackup] (
-            [Id] INTEGER PRIMARY KEY AUTOINCREMENT,
-            [UserId] TEXT NOT NULL,
-            [UserName] TEXT NOT NULL,
-            [Email] TEXT NOT NULL,
-            [FullName] TEXT NULL,
-            [UserRole] TEXT NULL,
-            [CreatedUser] TEXT NULL,
-            [ProfileImage] BLOB NULL,
-            [DeletedBy] TEXT NOT NULL,
-            [DeletedAt] TEXT NOT NULL,
-            [Reason] TEXT NULL
+        IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='EWO_MasterUserBackup' AND xtype='U')
+        CREATE TABLE [EWO_MasterUserBackup] (
+            [Id] INT IDENTITY(1,1) PRIMARY KEY,
+            [UserId] NVARCHAR(MAX) NOT NULL,
+            [UserName] NVARCHAR(MAX) NOT NULL,
+            [Email] NVARCHAR(MAX) NOT NULL,
+            [FullName] NVARCHAR(MAX) NULL,
+            [UserRole] NVARCHAR(MAX) NULL,
+            [CreatedUser] NVARCHAR(MAX) NULL,
+            [ProfileImage] VARBINARY(MAX) NULL,
+            [DeletedBy] NVARCHAR(MAX) NOT NULL,
+            [DeletedAt] NVARCHAR(MAX) NOT NULL,
+            [Reason] NVARCHAR(MAX) NULL
         );
 
-        CREATE TABLE IF NOT EXISTS [EWO_DeleteUserPost] (
-            [SNo] INTEGER PRIMARY KEY AUTOINCREMENT,
-            [UId] INTEGER NOT NULL,
-            [UserId] TEXT NOT NULL,
-            [ProfileImage] BLOB NULL,
-            [Caption] TEXT NULL,
-            [CreatedAt] TEXT NOT NULL,
-            [DeletedBy] TEXT NOT NULL,
-            [DeletedAt] TEXT NOT NULL,
-            [Reason] TEXT NULL
+        IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='EWO_DeleteUserPost' AND xtype='U')
+        CREATE TABLE [EWO_DeleteUserPost] (
+            [SNo] INT IDENTITY(1,1) PRIMARY KEY,
+            [UId] INT NOT NULL,
+            [UserId] NVARCHAR(MAX) NOT NULL,
+            [ProfileImage] VARBINARY(MAX) NULL,
+            [Caption] NVARCHAR(MAX) NULL,
+            [CreatedAt] NVARCHAR(MAX) NOT NULL,
+            [DeletedBy] NVARCHAR(MAX) NOT NULL,
+            [DeletedAt] NVARCHAR(MAX) NOT NULL,
+            [Reason] NVARCHAR(MAX) NULL
         );
 
-        CREATE TABLE IF NOT EXISTS [EWO_AdminAuditLog] (
-            [Id] INTEGER PRIMARY KEY AUTOINCREMENT,
-            [AdminId] TEXT NOT NULL,
-            [AdminName] TEXT NOT NULL,
-            [Action] TEXT NOT NULL,
-            [TargetId] TEXT NULL,
-            [TargetName] TEXT NULL,
-            [Details] TEXT NULL,
-            [Timestamp] TEXT NOT NULL,
-            [IpAddress] TEXT NULL
+        IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='EWO_AdminAuditLog' AND xtype='U')
+        CREATE TABLE [EWO_AdminAuditLog] (
+            [Id] INT IDENTITY(1,1) PRIMARY KEY,
+            [AdminId] NVARCHAR(MAX) NOT NULL,
+            [AdminName] NVARCHAR(MAX) NOT NULL,
+            [Action] NVARCHAR(MAX) NOT NULL,
+            [TargetId] NVARCHAR(MAX) NULL,
+            [TargetName] NVARCHAR(MAX) NULL,
+            [Details] NVARCHAR(MAX) NULL,
+            [Timestamp] NVARCHAR(MAX) NOT NULL,
+            [IpAddress] NVARCHAR(MAX) NULL
         );";
     
     await context.Database.ExecuteSqlRawAsync(createBackupTablesSql);
