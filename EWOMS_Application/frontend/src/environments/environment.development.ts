@@ -1,4 +1,4 @@
 export const environment = {
   production: false,
-  apiUrl: 'https://localhost:7107/api'
+  apiUrl: 'https://ewoms-application.runasp.net/api'
 };
