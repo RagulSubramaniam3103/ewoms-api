@@ -137,12 +137,21 @@ namespace EWOMS_CoreAPI.Hubber
                     Console.WriteLine($"[ChatHub] Message delivered to receiver {receiverId}");
                 }
 
-                // Notify all connections of the sender (including the one who sent it)
+                // Notify the sender (echo back)
+                await Clients.Caller.SendAsync("ReceiveMessage", msg);
+                Console.WriteLine($"[ChatHub] Message echoed back to sender {senderId}");
+
+                // Notify other connections of the sender (e.g. other tabs)
                 var senderConnections = _online.GetConnections(senderId);
-                if (senderConnections != null && senderConnections.Any())
+                if (senderConnections != null)
                 {
-                    await Clients.Clients(senderConnections).SendAsync("ReceiveMessage", msg);
-                    Console.WriteLine($"[ChatHub] Message echoed back to sender {senderId}");
+                    foreach (var connId in senderConnections)
+                    {
+                        if (connId != Context.ConnectionId)
+                        {
+                            await Clients.Client(connId).SendAsync("ReceiveMessage", msg);
+                        }
+                    }
                 }
             }
             catch (Exception ex)
