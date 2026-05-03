@@ -7,7 +7,7 @@ chat-server/chat.db
 dist/
 .angular/
 .vscode/
-*.zip
+# *.zip removed to allow publishing packages
 
 # OS
 .DS_Store
