@@ -24,8 +24,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 //DB Connection
 
-var dbPath = Path.Combine(AppContext.BaseDirectory, "ewoms.db");
-builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite($"Data Source={dbPath}"));
+// DB Connection - Configured for SQL Server (MonsterASP)
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddDbContext<ApplicationDbContext>(options => 
+    options.UseSqlServer(connectionString, b => b.MigrationsAssembly("EWOMS_ClassLibrary")));
 
 //-----------//
 
