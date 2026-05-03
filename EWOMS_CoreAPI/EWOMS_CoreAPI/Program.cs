@@ -222,19 +222,32 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    // Apply any pending migrations (safely updates schema without deleting data)
-    await context.Database.MigrateAsync();
-
-    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-
-    string[] roles = { "Admin", "User", "Manager" };
-
-    foreach (var role in roles)
+    try 
     {
-        if (!await roleManager.RoleExistsAsync(role))
+        // Apply any pending migrations
+        await context.Database.MigrateAsync();
+        
+        var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+        string[] roles = { "Admin", "User", "Manager" };
+        foreach (var role in roles)
         {
-            await roleManager.CreateAsync(new IdentityRole(role));
+            if (!await roleManager.RoleExistsAsync(role))
+            {
+                await roleManager.CreateAsync(new IdentityRole(role));
+            }
         }
+    }
+    catch (Exception ex)
+    {
+        // Log migration error but allow app to start for diagnostics
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred during database migration.");
+        
+        // ALSO write to a simple file in the root for easy access via WebFTP
+        try {
+            System.IO.File.WriteAllText(Path.Combine(AppContext.BaseDirectory, "migration_error.txt"), 
+                ex.ToString() + "\n\nConnection String: " + connectionString);
+        } catch {}
     }
 
     // Ensure Backup Tables Exist (SQL Server Syntax)
@@ -285,6 +298,7 @@ using (var scope = app.Services.CreateScope())
 
 // Configure the HTTP request pipeline.
 // Enable Swagger ALWAYS so we can test on MonsterASP
+app.UseDeveloperExceptionPage(); // Temporarily enabled for production debugging
 app.UseSwagger();
 app.UseSwaggerUI();
 
