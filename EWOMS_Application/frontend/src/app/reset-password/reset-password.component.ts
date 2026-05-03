@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-reset-password',
@@ -67,7 +68,7 @@ export class ResetPasswordComponent implements OnInit {
 
     const { oldPassword, password, confirmPassword } = this.resetForm.value;
 
-    const apiUrl = 'https://localhost:7107/api/ManageUsers/ForgotPassword_User';
+    const apiUrl = `${environment.apiUrl}/ManageUsers/ForgotPassword_User`;
     
     const params = new HttpParams()
       .set('Email', this.email)

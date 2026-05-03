@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "http://ewoms-application.tryasp.net/api/:path*"
+    },
+    {
+      "source": "/chathub/:path*",
+      "destination": "http://ewoms-application.tryasp.net/chathub/:path*"
+    }
+  ]
+}

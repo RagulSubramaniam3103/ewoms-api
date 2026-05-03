@@ -40,7 +40,7 @@ export class LoginComponent implements OnInit {
       UserName: ['', Validators.required],
       Email: ['', [Validators.required, Validators.email]],
       Password: ['', [Validators.required, Validators.minLength(6)]],
-      UserRole: [{ value: 'User', disabled: true }, Validators.required]
+      UserRole: ['User', Validators.required]
     });
   }
 

@@ -24,7 +24,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 //DB Connection
 
-builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+var dbPath = Path.Combine(AppContext.BaseDirectory, "ewoms.db");
+builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite($"Data Source={dbPath}"));
 
 //-----------//
 
@@ -219,8 +220,8 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    // Ensure database is created and migrations are applied
-    await context.Database.MigrateAsync();
+    // Ensure database and tables are created (but do not delete existing data)
+    await context.Database.EnsureCreatedAsync();
 
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
@@ -278,10 +279,13 @@ using (var scope = app.Services.CreateScope())
 }
 
 // Configure the HTTP request pipeline.
+// Enable Swagger ALWAYS so we can test on MonsterASP
+app.UseSwagger();
+app.UseSwaggerUI();
+
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    // Local development settings
 }
 
 app.UseHttpsRedirection();
