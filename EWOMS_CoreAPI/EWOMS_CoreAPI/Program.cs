@@ -220,8 +220,8 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    // Ensure database and tables are created (but do not delete existing data)
-    await context.Database.EnsureCreatedAsync();
+    // Apply any pending migrations (safely updates schema without deleting data)
+    await context.Database.MigrateAsync();
 
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
