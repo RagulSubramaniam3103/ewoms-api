@@ -5,8 +5,8 @@
       "destination": "http://ewoms-application.runasp.net/api/:path*"
     },
     {
-      "source": "/chathub/:path*",
-      "destination": "http://ewoms-application.runasp.net/chathub/:path*"
+      "source": "/chatHub/:path*",
+      "destination": "http://ewoms-application.runasp.net/chatHub/:path*"
     }
   ]
 }

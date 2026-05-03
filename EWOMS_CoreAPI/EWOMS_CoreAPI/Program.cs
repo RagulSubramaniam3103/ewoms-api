@@ -191,10 +191,10 @@ builder.Services.AddAuthorization(options =>
 
 builder.Services.AddCors(options => {
     options.AddDefaultPolicy(policy => {
-        policy.WithOrigins("http://localhost:54950", "http://localhost:4200")
+        policy.SetIsOriginAllowed(origin => true) // Allow any origin for SignalR cross-domain
               .AllowAnyHeader()
               .AllowAnyMethod()
-              .AllowCredentials(); // Required for SignalR WebSocket connections
+              .AllowCredentials(); 
     });
 });
 
